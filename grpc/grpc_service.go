@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/domain"
-	// Generated from proto// Proto generated code
+	pb "github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/proto" // Proto generated code
 )
 
 type GRPCChatService struct {

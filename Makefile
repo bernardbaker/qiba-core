@@ -2,7 +2,7 @@
 APP_NAME := chat-app
 MODULE_NAME := github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern
 PROTO_DIR := proto
-PROTO_FILE := /Users/bernardbaker/go/src/hexagonal.streamlit.chat/$(PROTO_DIR)/chat.proto
+PROTO_FILE := /Users/bernardbaker/go/src/github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/$(PROTO_DIR)/chat.proto
 GRPC_OUT_DIR := .
 SRC_DIR := .
 
@@ -15,6 +15,10 @@ BINARY := $(APP_NAME)
 # Protoc
 UNAME_S := $(shell uname -s)
 UNAME_M := $(shell uname -m)
+
+# Define the protoc version and download link
+PROTOC_VERSION := 25.1
+PROTOC_ZIP := protoc-$(PROTOC_VERSION)-linux-x86_64.zip
 
 ifeq ($(UNAME_S),Darwin)
     ifeq ($(UNAME_M),arm64)
@@ -29,10 +33,6 @@ else
         PROTOC_ZIP := protoc-$(PROTOC_VERSION)-linux-aarch_64.zip
     endif
 endif
-
-# Define the protoc version and download link
-PROTOC_VERSION := 25.1
-PROTOC_ZIP := protoc-$(PROTOC_VERSION)-linux-x86_64.zip
 
 PROTOC_URL := https://github.com/protocolbuffers/protobuf/releases/download/v$(PROTOC_VERSION)/$(PROTOC_ZIP)
 PROTOC_DIR := /usr/local/protoc
@@ -87,14 +87,19 @@ install-protoc:
 .PHONY: add-protoc-to-path
 add-protoc-to-path:
 	@echo "Adding protoc to PATH..."
-	@export PATH="$(PROTOC_DIR)/bin:$PATH"
+	export PATH="$(PROTOC_DIR)/bin:$$PATH"
 
 # Generate gRPC code from proto file
 .PHONY: proto
-proto:
+proto: check-protoc
 	@echo "Generating gRPC code..."
-	go generate ./...
-
+	@if command -v protoc >/dev/null 2>&1; then \
+	$(PROTOC) --proto_path=/Users/bernardbaker/go/src/github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/proto/ --go-grpc_out=$(GRPC_OUT_DIR) $(PROTO_FILE); \
+	else \
+		echo "protoc not found, falling back to direct protoc call"; \
+		go generate ./...; \
+	fi
+# $(PROTOC) --proto_path=/Users/bernardbaker/go/src/hexagonal.streamlit.chat/proto/chat.proto --go_out=plugins=grpc:$(GRPC_OUT_DIR) $(PROTO_FILE); \
 # proto:
 #  @echo "Generating gRPC code from $(PROTO_FILE)"
 # $(PROTOC) --go_out=plugins=grpc:$(GRPC_OUT_DIR) $(PROTO_FILE)

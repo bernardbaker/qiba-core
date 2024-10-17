@@ -8,8 +8,8 @@ create_file_with_content() {
     echo "Created $filepath"
 }
 
-# Base project directory
-PROJECT_DIR="chat-app"
+# Base project directory (github repo)
+PROJECT_DIR="."
 
 # Create project structure
 echo "Creating project directory structure..."
@@ -94,8 +94,8 @@ GRPC_CONTENT='package grpc
 import (
     "context"
     "github.com/google/uuid"
-    "github.com/chat-app/domain"
-    pb "github.com/chat-app/proto" // Proto generated code
+    "github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/domain"
+    pb "github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/proto" // Proto generated code
 )
 
 type GRPCChatService struct {
@@ -199,7 +199,7 @@ create_file_with_content "$PROJECT_DIR/aws/aws_messaging.go" "$AWS_CONTENT"
 REPO_CONTENT='package repository
 
 import (
-    "github.com/chat-app/domain"
+    "github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/domain"
 )
 
 type MemoryMessageRepository struct {
@@ -234,13 +234,13 @@ import (
     "log"
     "net"
 
-    "github.com/chat-app/aws"
-    "github.com/chat-app/domain"
-    "github.com/chat-app/grpc"
-    "github.com/chat-app/repository"
+    "github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/aws"
+    "github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/domain"
+    "github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/grpc"
+    "github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/repository"
 
     "google.golang.org/grpc"
-    pb "github.com/chat-app/proto"
+    pb "github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/proto"
 )
 
 func main() {

@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package chat;
 
+option go_package = "proto/";
+
 // The chat service definition.
 service ChatService {
   // Sends a message from a viewer to the content creator
