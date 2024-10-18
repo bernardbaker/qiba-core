@@ -99,6 +99,7 @@ proto: check-protoc
 		echo "protoc not found, falling back to direct protoc call"; \
 		go generate ./...; \
 	fi
+# protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative chat.proto 
 # $(PROTOC) --proto_path=/Users/bernardbaker/go/src/hexagonal.streamlit.chat/proto/chat.proto --go_out=plugins=grpc:$(GRPC_OUT_DIR) $(PROTO_FILE); \
 # proto:
 #  @echo "Generating gRPC code from $(PROTO_FILE)"

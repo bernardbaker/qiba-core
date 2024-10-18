@@ -1,10 +1,13 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/domain"
 )
 
 type SNSPublisher struct {
@@ -20,14 +23,35 @@ func NewSNSPublisher(topicArn string) *SNSPublisher {
 	}
 }
 
-func (p *SNSPublisher) PublishMessage(message string) error {
+func (p *SNSPublisher) PublishMessage(message domain.Message) error {
 	_, err := p.snsClient.Publish(&sns.PublishInput{
-		Message:  aws.String(message),
+		Message:  aws.String(message.Content),
 		TopicArn: aws.String(p.topicArn),
 	})
 	return err
 }
 
+// Publish sends a message to the given viewers via SNS
+func (p *SNSPublisher) Publish(content string, viewers []string) error {
+	// Here, we'll send the content to SNS for the provided viewers.
+	// For demonstration, we're just logging the message.
+	for _, viewer := range viewers {
+		// Example of publishing to SNS
+		input := &sns.PublishInput{
+			Message:  aws.String(fmt.Sprintf("Message for viewer %s: %s", viewer, content)),
+			TopicArn: aws.String(p.topicArn),
+		}
+
+		_, err := p.snsClient.Publish(input)
+		if err != nil {
+			return fmt.Errorf("failed to publish message to SNS: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// SQSReceiver is responsible for receiving messages from SQS
 type SQSReceiver struct {
 	sqsClient *sqs.SQS
 	queueUrl  string
@@ -41,20 +65,23 @@ func NewSQSReceiver(queueUrl string) *SQSReceiver {
 	}
 }
 
-func (r *SQSReceiver) ReceiveMessages() ([]string, error) {
-	result, err := r.sqsClient.ReceiveMessage(&sqs.ReceiveMessageInput{
-		QueueUrl:            &r.queueUrl,
-		MaxNumberOfMessages: aws.Int64(10),
-		WaitTimeSeconds:     aws.Int64(10),
-	})
+// Receive receives messages from the SQS queue
+func (r *SQSReceiver) Receive() ([]string, error) {
+	// Receive messages from the SQS queue
+	input := &sqs.ReceiveMessageInput{
+		QueueUrl:            aws.String(r.queueUrl),
+		MaxNumberOfMessages: aws.Int64(10), // Maximum number of messages to return
+	}
 
+	result, err := r.sqsClient.ReceiveMessage(input)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to receive message from SQS: %w", err)
 	}
 
 	messages := []string{}
-	for _, msg := range result.Messages {
-		messages = append(messages, *msg.Body)
+	for _, message := range result.Messages {
+		messages = append(messages, *message.Body) // Extracting message body
 	}
+
 	return messages, nil
 }

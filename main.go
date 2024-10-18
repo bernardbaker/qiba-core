@@ -1,41 +1,82 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
+	"time"
 
 	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/aws"
 	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/domain"
-	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/grpc"
+	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/proto"
 	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/repository"
 
-	pb "github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/proto"
-	"google.golang.org/grpc"
+	grpc "google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
-func main() {
-	// Create the repository
-	repo := repository.NewMemoryMessageRepository()
+// ChatServer implements the gRPC server for chat service
+type ChatServer struct {
+	domain.ChatService
+}
 
-	// Create SNS Publisher and SQS Receiver
+// NewChatServer creates a new instance of ChatServer
+func NewChatServer(chatService *domain.ChatService) *ChatServer {
+	return &ChatServer{
+		ChatService: *chatService,
+	}
+}
+
+// Implement the gRPC service methods (SendMessage, BroadcastMessage, etc.)
+
+func main() {
+	// Initialize repository (e.g., in-memory or database-backed)
+	repo := repository.NewMemoryMessageRepository() // Assuming in-memory for now
+
+	// Initialize AWS SNS Publisher with an example SNS Topic ARN
 	snsPublisher := aws.NewSNSPublisher("sns-topic-arn")
+
+	// Initialize AWS SQS Receiver with an example SQS Queue URL
 	sqsReceiver := aws.NewSQSReceiver("sqs-queue-url")
 
-	// Create the domain service
+	// Create the ChatService domain layer
 	chatService := domain.NewChatService(repo, snsPublisher, sqsReceiver)
 
-	// Set up the gRPC server
-	lis, err := net.Listen("tcp", ":50051")
+	// Initialize the gRPC server
+	grpcServer := grpc.NewServer()
+
+	// Register your gRPC service implementation
+	chatServer := NewChatServer(chatService)
+	// Assuming RegisterChatServiceServer is the function to register the gRPC service, replace with the actual generated code --replaces
+	// Receive() ([]string, error)
+	proto.RegisterChatServiceServer(grpcServer, chatServer)
+
+	// Enable gRPC reflection (useful for debugging)
+	reflection.Register(grpcServer)
+
+	// Set up the gRPC server listener on a specific port
+	listener, err := net.Listen("tcp", ":50051")
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Fatalf("failed to listen on port 50051: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
-	chatGrpcService := grpc.NewGRPCChatService(chatService)
-	pb.RegisterChatServiceServer(grpcServer, chatGrpcService)
+	// Start a background goroutine to periodically poll and process messages from SQS
+	go func() {
+		for {
+			// Receive messages from the SQS queue
+			err := chatService.ReceiveMessages()
+			if err != nil {
+				log.Printf("Error receiving messages from SQS: %v", err)
+			}
 
-	log.Printf("Server listening on port 50051...")
-	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+			// Sleep for 10 seconds before the next polling attempt (adjust the interval as needed)
+			time.Sleep(10 * time.Second)
+		}
+	}()
+
+	// Start the gRPC server
+	fmt.Println("Starting gRPC server on port 50051...")
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("failed to serve gRPC server: %v", err)
 	}
 }

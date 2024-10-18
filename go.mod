@@ -1,5 +1,6 @@
 module github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern
 
+
 go 1.22.1
 
 require (
