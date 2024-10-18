@@ -66,7 +66,7 @@ func main() {
 			// Receive messages from the SQS queue
 			err := chatService.ReceiveMessages()
 			if err != nil {
-				log.Printf("Error receiving messages from SQS: %v", err)
+				log.Printf("Error receiving messages from Memory/SQS: %v", err)
 			}
 
 			// Sleep for 10 seconds before the next polling attempt (adjust the interval as needed)

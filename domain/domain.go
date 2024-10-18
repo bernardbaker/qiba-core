@@ -20,6 +20,7 @@ type Message struct {
 
 type MessageRepository interface {
 	Save(message *Message) error
+	GetAll() ([]*Message, error)
 }
 
 // Publisher defines an interface for publishing messages
@@ -64,10 +65,10 @@ func (s *ChatService) SendMessage(ctx context.Context, req *proto.MessageRequest
 	}
 
 	// Publish the message
-	err = s.publisher.Publish(message.Content, []string{message.Viewer})
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to publish message: %v", err)
-	}
+	// err = s.publisher.Publish(message.Content, []string{message.Viewer})
+	// if err != nil {
+	// 	return nil, status.Errorf(codes.Internal, "failed to publish message: %v", err)
+	// }
 
 	return &proto.MessageResponse{
 		MessageId: message.ID,
@@ -96,10 +97,10 @@ func (s *ChatService) SendBroadcast(ctx context.Context, req *proto.BroadcastReq
 	}
 
 	// Publish the message to all viewers
-	err := s.publisher.Publish(content, viewers)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to publish broadcast message: %v", err)
-	}
+	// err := s.publisher.Publish(content, viewers)
+	// if err != nil {
+	// 	return nil, status.Errorf(codes.Internal, "failed to publish broadcast message: %v", err)
+	// }
 
 	return &proto.BroadcastResponse{
 		Status: "broadcast sent",
@@ -107,32 +108,46 @@ func (s *ChatService) SendBroadcast(ctx context.Context, req *proto.BroadcastReq
 }
 
 // ReceiveMessages retrieves and processes messages from the SQS queue
+// func (s *ChatService) ReceiveMessages() error {
+// 	// Receive messages from SQS
+// 	messages, err := s.receiver.Receive()
+// 	if err != nil {
+// 		return fmt.Errorf("failed to receive messages: %w", err)
+// 	}
+
+// 	// Process each received message
+// 	for _, content := range messages {
+// 		message := Message{
+// 			ID:      generateMessageID(),
+// 			Content: content,
+// 			Viewer:  "system", // Set the viewer ID for system messages or adjust based on logic
+// 		}
+
+// 		// Save the message to the repository
+// 		err := s.repo.Save(&message)
+// 		if err != nil {
+// 			return fmt.Errorf("failed to save received message: %w", err)
+// 		}
+
+// 		// Optionally, publish the received message if required
+// 		err = s.publisher.Publish(message.Content, []string{message.Viewer})
+// 		if err != nil {
+// 			return fmt.Errorf("failed to publish received message: %w", err)
+// 		}
+// 	}
+
+//		return nil
+//	}
 func (s *ChatService) ReceiveMessages() error {
-	// Receive messages from SQS
-	messages, err := s.receiver.Receive()
+	// Receive messages from memory
+	messages, err := s.repo.GetAll()
 	if err != nil {
-		return fmt.Errorf("failed to receive messages: %w", err)
+		return fmt.Errorf("failed to get all messages: %w", err)
 	}
 
-	// Process each received message
-	for _, content := range messages {
-		message := Message{
-			ID:      generateMessageID(),
-			Content: content,
-			Viewer:  "system", // Set the viewer ID for system messages or adjust based on logic
-		}
-
-		// Save the message to the repository
-		err := s.repo.Save(&message)
-		if err != nil {
-			return fmt.Errorf("failed to save received message: %w", err)
-		}
-
-		// Optionally, publish the received message if required
-		err = s.publisher.Publish(message.Content, []string{message.Viewer})
-		if err != nil {
-			return fmt.Errorf("failed to publish received message: %w", err)
-		}
+	for _, message := range messages {
+		// Print the message content
+		fmt.Printf("Received message: %s\n", message.Content)
 	}
 
 	return nil
