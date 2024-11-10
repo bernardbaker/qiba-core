@@ -6,8 +6,8 @@ import (
 	"net"
 	"time"
 
+	"github.com/bernardbaker/qiba.core/adapters"
 	"github.com/bernardbaker/qiba.core/aws"
-	"github.com/bernardbaker/qiba.core/domain"
 	"github.com/bernardbaker/qiba.core/proto"
 	"github.com/bernardbaker/qiba.core/repository"
 
@@ -17,17 +17,15 @@ import (
 
 // ChatServer implements the gRPC server for chat service
 type ChatServer struct {
-	domain.ChatService
+	adapters.ChatService
 }
 
 // NewChatServer creates a new instance of ChatServer
-func NewChatServer(chatService *domain.ChatService) *ChatServer {
+func NewChatServer(chatService *adapters.ChatService) *ChatServer {
 	return &ChatServer{
 		ChatService: *chatService,
 	}
 }
-
-// Implement the gRPC service methods (SendMessage, BroadcastMessage, etc.)
 
 func main() {
 	// Initialize repository (e.g., in-memory or database-backed)
@@ -40,7 +38,7 @@ func main() {
 	sqsReceiver := aws.NewSQSReceiver("sqs-queue-url")
 
 	// Create the ChatService domain layer
-	chatService := domain.NewChatService(repo, snsPublisher, sqsReceiver)
+	chatService := adapters.NewChatService(repo, snsPublisher, sqsReceiver)
 
 	// Initialize the gRPC server
 	grpcServer := grpc.NewServer()

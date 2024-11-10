@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/bernardbaker/qiba.core/ports"
+	"github.com/bernardbaker/qiba.core/domain"
 )
 
 type SNSPublisher struct {
@@ -23,7 +23,7 @@ func NewSNSPublisher(topicArn string) *SNSPublisher {
 	}
 }
 
-func (p *SNSPublisher) PublishMessage(message ports.Message) error {
+func (p *SNSPublisher) PublishMessage(message domain.Message) error {
 	_, err := p.snsClient.Publish(&sns.PublishInput{
 		Message:  aws.String(message.Content),
 		TopicArn: aws.String(p.topicArn),
