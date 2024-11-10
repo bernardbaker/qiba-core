@@ -45,6 +45,14 @@ message SendMessageRequest {
     string text = 3;
 }
 
+message GetChatsForUserRequest {
+    int64 user_id = 1;
+}
+
+message GetMessagesFromChatRequest {
+    int64 chat_id = 1;
+}
+
 // Request to get user information
 message GetUserInfoRequest {
     int64 user_id = 1;
@@ -222,10 +230,10 @@ service TelegramMiniApp {
     rpc CreateChat(CreateChatRequest) returns (CreateChatResponse);
 
     // Method to get all chats the user is part of
-    rpc GetChatsForUser(int64) returns (GetChatsResponse);
+    rpc GetChatsForUser(GetChatsForUserRequest) returns (GetChatsResponse);
 
     // Method to get messages from a chat
-    rpc GetMessagesFromChat(int64) returns (GetMessagesResponse);
+    rpc GetMessagesFromChat(GetMessagesFromChatRequest) returns (GetMessagesResponse);
 
     // Method to send media messages (photo, video, etc.)
     rpc SendMediaMessage(SendMediaMessageRequest) returns (SendMediaMessageResponse);

@@ -95,7 +95,7 @@ add-protoc-to-path:
 proto: check-protoc
 	@echo "Generating gRPC code..."
 	@if command -v protoc >/dev/null 2>&1; then \
-	$(PROTOC) --proto_path=/Users/bernardbaker/go/src/github.com/bernardbaker/qiba.core/proto/ --go-grpc_out=$(GRPC_OUT_DIR) $(PROTO_FILE); \
+	$(PROTOC) --proto_path=/Users/bernardbaker/Projects/qiba.core/proto/ --go-grpc_out=$(GRPC_OUT_DIR) $(PROTO_FILE); \
 	else \
 		echo "protoc not found, falling back to direct protoc call"; \
 		go generate ./...; \
