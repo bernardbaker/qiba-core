@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package chat;
 
-option go_package = "proto/";
+option go_package = "/proto";
 
 // Message representing a user in the Telegram Mini App
 message User {
@@ -264,31 +264,31 @@ service TelegramMiniApp {
 service ChatService {
     // Sends a message from a viewer to the content creator
     rpc SendMessage (MessageRequest) returns (MessageResponse);
-    
+
     // Content creator sends a message back to a single viewer or all viewers
     rpc SendBroadcast (BroadcastRequest) returns (BroadcastResponse);
-  }
+}
   
-  // Message request from a viewer
-  message MessageRequest {
+// Message request from a viewer
+message MessageRequest {
     string viewer_id = 1;
     string content = 2;
-  }
-  
-  // Message response after a message is sent
-  message MessageResponse {
+}
+
+// Message response after a message is sent
+message MessageResponse {
     string message_id = 1;
     string status = 2;
-  }
-  
-  // Broadcast request from the content creator
-  message BroadcastRequest {
+}
+
+// Broadcast request from the content creator
+message BroadcastRequest {
     string message = 1;
     repeated string viewers = 2; // list of viewer ids, if empty, send to all
-  }
-  
-  // Broadcast response after broadcasting
-  message BroadcastResponse {
+}
+
+// Broadcast response after broadcasting
+message BroadcastResponse {
     string status = 1;
-  }
+}
   
