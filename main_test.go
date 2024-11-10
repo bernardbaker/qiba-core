@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/proto"
+	"github.com/bernardbaker/qiba.core/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

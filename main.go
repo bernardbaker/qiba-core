@@ -6,10 +6,10 @@ import (
 	"net"
 	"time"
 
-	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/aws"
-	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/domain"
-	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/proto"
-	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/repository"
+	"github.com/bernardbaker/qiba.core/aws"
+	"github.com/bernardbaker/qiba.core/domain"
+	"github.com/bernardbaker/qiba.core/proto"
+	"github.com/bernardbaker/qiba.core/repository"
 
 	grpc "google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

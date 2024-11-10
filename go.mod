@@ -1,5 +1,4 @@
-module github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern
-
+module github.com/bernardbaker/qiba.core
 
 go 1.22.1
 

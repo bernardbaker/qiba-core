@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/domain"
+	"github.com/bernardbaker/qiba.core/domain"
 )
 
 type SNSPublisher struct {

@@ -6,7 +6,7 @@ import (
 
 	"context"
 
-	proto "github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/proto"
+	proto "github.com/bernardbaker/qiba.core/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

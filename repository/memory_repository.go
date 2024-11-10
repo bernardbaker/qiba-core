@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/domain"
+	"github.com/bernardbaker/qiba.core/domain"
 )
 
 type MemoryMessageRepository struct {

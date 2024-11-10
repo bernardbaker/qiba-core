@@ -1,12 +1,13 @@
 # Define variables
-APP_NAME := chat-app
-MODULE_NAME := github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern
+APP_NAME := qiba-core
+MODULE_NAME := github.com/bernardbaker/qiba.core
+
 PROTO_DIR := proto
-PROTO_FILE := /Users/bernardbaker/go/src/github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/$(PROTO_DIR)/chat.proto
+PROTO_FILE := /Users/bernardbaker/Projects/qiba.core/$(PROTO_DIR)/api.proto
 GRPC_OUT_DIR := .
 SRC_DIR := .
 
-AWS_STACK_NAME := chat-app-stack
+AWS_STACK_NAME := qiba-app-stack
 CLOUDFORMATION_TEMPLATE := cloudformation.yml
 
 GO_FILES := $(shell find . -name '*.go')
@@ -94,7 +95,7 @@ add-protoc-to-path:
 proto: check-protoc
 	@echo "Generating gRPC code..."
 	@if command -v protoc >/dev/null 2>&1; then \
-	$(PROTOC) --proto_path=/Users/bernardbaker/go/src/github.com/bernardbaker/streamlit.chat.using.hexagonal.pattern/proto/ --go-grpc_out=$(GRPC_OUT_DIR) $(PROTO_FILE); \
+	$(PROTOC) --proto_path=/Users/bernardbaker/go/src/github.com/bernardbaker/qiba.core/proto/ --go-grpc_out=$(GRPC_OUT_DIR) $(PROTO_FILE); \
 	else \
 		echo "protoc not found, falling back to direct protoc call"; \
 		go generate ./...; \
