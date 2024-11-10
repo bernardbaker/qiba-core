@@ -6,43 +6,22 @@ import (
 
 	"context"
 
+	"github.com/bernardbaker/qiba.core/ports"
 	proto "github.com/bernardbaker/qiba.core/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-// Message represents a chat message
-type Message struct {
-	ID      string
-	Content string
-	Viewer  string
-}
-
-type MessageRepository interface {
-	Save(message *Message) error
-	GetAll() ([]*Message, error)
-}
-
-// Publisher defines an interface for publishing messages
-type Publisher interface {
-	Publish(string, []string) error
-}
-
-// Receiver defines an interface for receiving messages
-type Receiver interface {
-	Receive() ([]string, error)
-}
-
 // ChatService defines the chat service operations
 type ChatService struct {
-	repo                                 MessageRepository
-	publisher                            Publisher
-	receiver                             Receiver
+	repo                                 ports.MessageRepository
+	publisher                            ports.Publisher
+	receiver                             ports.Receiver
 	proto.UnimplementedChatServiceServer // Embed this to get default implementations
 }
 
 // NewChatService creates a new ChatService
-func NewChatService(repo MessageRepository, publisher Publisher, receiver Receiver) *ChatService {
+func NewChatService(repo ports.MessageRepository, publisher ports.Publisher, receiver ports.Receiver) *ChatService {
 	return &ChatService{
 		repo:      repo,
 		publisher: publisher,
@@ -52,7 +31,7 @@ func NewChatService(repo MessageRepository, publisher Publisher, receiver Receiv
 
 // SendMessage saves and publishes a message from a viewer
 func (s *ChatService) SendMessage(ctx context.Context, req *proto.MessageRequest) (*proto.MessageResponse, error) {
-	message := Message{
+	message := ports.Message{
 		ID:      generateMessageID(),
 		Content: req.Content,
 		Viewer:  req.ViewerId,
@@ -83,7 +62,7 @@ func (s *ChatService) SendBroadcast(ctx context.Context, req *proto.BroadcastReq
 	viewers := req.Viewers
 
 	for _, viewerID := range viewers {
-		message := Message{
+		message := ports.Message{
 			ID:      generateMessageID(),
 			Content: content,
 			Viewer:  viewerID,
@@ -107,37 +86,6 @@ func (s *ChatService) SendBroadcast(ctx context.Context, req *proto.BroadcastReq
 	}, nil
 }
 
-// ReceiveMessages retrieves and processes messages from the SQS queue
-// func (s *ChatService) ReceiveMessages() error {
-// 	// Receive messages from SQS
-// 	messages, err := s.receiver.Receive()
-// 	if err != nil {
-// 		return fmt.Errorf("failed to receive messages: %w", err)
-// 	}
-
-// 	// Process each received message
-// 	for _, content := range messages {
-// 		message := Message{
-// 			ID:      generateMessageID(),
-// 			Content: content,
-// 			Viewer:  "system", // Set the viewer ID for system messages or adjust based on logic
-// 		}
-
-// 		// Save the message to the repository
-// 		err := s.repo.Save(&message)
-// 		if err != nil {
-// 			return fmt.Errorf("failed to save received message: %w", err)
-// 		}
-
-// 		// Optionally, publish the received message if required
-// 		err = s.publisher.Publish(message.Content, []string{message.Viewer})
-// 		if err != nil {
-// 			return fmt.Errorf("failed to publish received message: %w", err)
-// 		}
-// 	}
-
-//		return nil
-//	}
 func (s *ChatService) ReceiveMessages() error {
 	// Receive messages from memory
 	messages, err := s.repo.GetAll()
