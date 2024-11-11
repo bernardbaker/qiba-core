@@ -14,7 +14,7 @@ import (
 func main() {
 	// Initialize repository, encrypter, and game service
 	repo := infrastructure.NewInMemoryGameRepository() // Our in-memory game repository
-	encrypter := infrastructure.NewEncrypter([]byte("mysecretencryptionkey1234567890!"))
+	encrypter := infrastructure.NewEncrypter([]byte("mysecretencryptionkey1234567890a"))
 	service := app.NewGameService(repo, encrypter)
 
 	// Setup and start gRPC server

@@ -25,11 +25,11 @@ func (e *Encrypter) EncryptGameData(data interface{}) (string, string, error) {
 		return "", "", err
 	}
 
+	// Initialize cipher block and GCM
 	block, err := aes.NewCipher(e.key)
 	if err != nil {
 		return "", "", err
 	}
-
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return "", "", err
@@ -40,13 +40,15 @@ func (e *Encrypter) EncryptGameData(data interface{}) (string, string, error) {
 		return "", "", err
 	}
 
+	// Encrypt the JSON data and prefix the nonce
 	ciphertext := gcm.Seal(nonce, nonce, jsonData, nil)
-	encryptedData := base64.StdEncoding.EncodeToString(ciphertext)
+	// encryptedData := base64.StdEncoding.EncodeToString(ciphertext)
 
-	// Generate HMAC
+	// Generate HMAC on the ciphertext (including nonce)
 	mac := hmac.New(sha256.New, e.key)
-	mac.Write(jsonData)
+	mac.Write(ciphertext)
 	hmacValue := base64.StdEncoding.EncodeToString(mac.Sum(nil))
 
-	return encryptedData, hmacValue, nil
+	// return encryptedData, hmacValue, nil
+	return string(jsonData), hmacValue, nil
 }
