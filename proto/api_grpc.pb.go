@@ -19,20 +19,20 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TelegramMiniApp_InitData_FullMethodName            = "/chat.TelegramMiniApp/InitData"
-	TelegramMiniApp_SendMessage_FullMethodName         = "/chat.TelegramMiniApp/SendMessage"
-	TelegramMiniApp_GetUserInfo_FullMethodName         = "/chat.TelegramMiniApp/GetUserInfo"
-	TelegramMiniApp_CreateChat_FullMethodName          = "/chat.TelegramMiniApp/CreateChat"
-	TelegramMiniApp_GetChatsForUser_FullMethodName     = "/chat.TelegramMiniApp/GetChatsForUser"
-	TelegramMiniApp_GetMessagesFromChat_FullMethodName = "/chat.TelegramMiniApp/GetMessagesFromChat"
-	TelegramMiniApp_SendMediaMessage_FullMethodName    = "/chat.TelegramMiniApp/SendMediaMessage"
-	TelegramMiniApp_DeleteMessage_FullMethodName       = "/chat.TelegramMiniApp/DeleteMessage"
-	TelegramMiniApp_GetBotInfo_FullMethodName          = "/chat.TelegramMiniApp/GetBotInfo"
-	TelegramMiniApp_JoinChat_FullMethodName            = "/chat.TelegramMiniApp/JoinChat"
-	TelegramMiniApp_LeaveChat_FullMethodName           = "/chat.TelegramMiniApp/LeaveChat"
-	TelegramMiniApp_PinMessage_FullMethodName          = "/chat.TelegramMiniApp/PinMessage"
-	TelegramMiniApp_UnpinMessage_FullMethodName        = "/chat.TelegramMiniApp/UnpinMessage"
-	TelegramMiniApp_ProcessPayment_FullMethodName      = "/chat.TelegramMiniApp/ProcessPayment"
+	TelegramMiniApp_InitData_FullMethodName            = "/qiba.TelegramMiniApp/InitData"
+	TelegramMiniApp_SendMessage_FullMethodName         = "/qiba.TelegramMiniApp/SendMessage"
+	TelegramMiniApp_GetUserInfo_FullMethodName         = "/qiba.TelegramMiniApp/GetUserInfo"
+	TelegramMiniApp_CreateChat_FullMethodName          = "/qiba.TelegramMiniApp/CreateChat"
+	TelegramMiniApp_GetChatsForUser_FullMethodName     = "/qiba.TelegramMiniApp/GetChatsForUser"
+	TelegramMiniApp_GetMessagesFromChat_FullMethodName = "/qiba.TelegramMiniApp/GetMessagesFromChat"
+	TelegramMiniApp_SendMediaMessage_FullMethodName    = "/qiba.TelegramMiniApp/SendMediaMessage"
+	TelegramMiniApp_DeleteMessage_FullMethodName       = "/qiba.TelegramMiniApp/DeleteMessage"
+	TelegramMiniApp_GetBotInfo_FullMethodName          = "/qiba.TelegramMiniApp/GetBotInfo"
+	TelegramMiniApp_JoinChat_FullMethodName            = "/qiba.TelegramMiniApp/JoinChat"
+	TelegramMiniApp_LeaveChat_FullMethodName           = "/qiba.TelegramMiniApp/LeaveChat"
+	TelegramMiniApp_PinMessage_FullMethodName          = "/qiba.TelegramMiniApp/PinMessage"
+	TelegramMiniApp_UnpinMessage_FullMethodName        = "/qiba.TelegramMiniApp/UnpinMessage"
+	TelegramMiniApp_ProcessPayment_FullMethodName      = "/qiba.TelegramMiniApp/ProcessPayment"
 )
 
 // TelegramMiniAppClient is the client API for TelegramMiniApp service.
@@ -582,7 +582,7 @@ func _TelegramMiniApp_ProcessPayment_Handler(srv interface{}, ctx context.Contex
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var TelegramMiniApp_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "chat.TelegramMiniApp",
+	ServiceName: "qiba.TelegramMiniApp",
 	HandlerType: (*TelegramMiniAppServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -647,147 +647,181 @@ var TelegramMiniApp_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	ChatService_SendMessage_FullMethodName   = "/chat.ChatService/SendMessage"
-	ChatService_SendBroadcast_FullMethodName = "/chat.ChatService/SendBroadcast"
+	GameService_StartGame_FullMethodName = "/qiba.GameService/StartGame"
+	GameService_Tap_FullMethodName       = "/qiba.GameService/Tap"
+	GameService_EndGame_FullMethodName   = "/qiba.GameService/EndGame"
 )
 
-// ChatServiceClient is the client API for ChatService service.
+// GameServiceClient is the client API for GameService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// The chat service definition.
-type ChatServiceClient interface {
-	// Sends a message from a viewer to the content creator
-	SendMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*MessageResponse, error)
-	// Content creator sends a message back to a single viewer or all viewers
-	SendBroadcast(ctx context.Context, in *BroadcastRequest, opts ...grpc.CallOption) (*BroadcastResponse, error)
+// Game service
+type GameServiceClient interface {
+	StartGame(ctx context.Context, in *StartGameRequest, opts ...grpc.CallOption) (*StartGameResponse, error)
+	Tap(ctx context.Context, in *TapRequest, opts ...grpc.CallOption) (*TapResponse, error)
+	EndGame(ctx context.Context, in *EndGameRequest, opts ...grpc.CallOption) (*EndGameResponse, error)
 }
 
-type chatServiceClient struct {
+type gameServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewChatServiceClient(cc grpc.ClientConnInterface) ChatServiceClient {
-	return &chatServiceClient{cc}
+func NewGameServiceClient(cc grpc.ClientConnInterface) GameServiceClient {
+	return &gameServiceClient{cc}
 }
 
-func (c *chatServiceClient) SendMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+func (c *gameServiceClient) StartGame(ctx context.Context, in *StartGameRequest, opts ...grpc.CallOption) (*StartGameResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MessageResponse)
-	err := c.cc.Invoke(ctx, ChatService_SendMessage_FullMethodName, in, out, cOpts...)
+	out := new(StartGameResponse)
+	err := c.cc.Invoke(ctx, GameService_StartGame_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *chatServiceClient) SendBroadcast(ctx context.Context, in *BroadcastRequest, opts ...grpc.CallOption) (*BroadcastResponse, error) {
+func (c *gameServiceClient) Tap(ctx context.Context, in *TapRequest, opts ...grpc.CallOption) (*TapResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BroadcastResponse)
-	err := c.cc.Invoke(ctx, ChatService_SendBroadcast_FullMethodName, in, out, cOpts...)
+	out := new(TapResponse)
+	err := c.cc.Invoke(ctx, GameService_Tap_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ChatServiceServer is the server API for ChatService service.
-// All implementations must embed UnimplementedChatServiceServer
+func (c *gameServiceClient) EndGame(ctx context.Context, in *EndGameRequest, opts ...grpc.CallOption) (*EndGameResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(EndGameResponse)
+	err := c.cc.Invoke(ctx, GameService_EndGame_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GameServiceServer is the server API for GameService service.
+// All implementations must embed UnimplementedGameServiceServer
 // for forward compatibility.
 //
-// The chat service definition.
-type ChatServiceServer interface {
-	// Sends a message from a viewer to the content creator
-	SendMessage(context.Context, *MessageRequest) (*MessageResponse, error)
-	// Content creator sends a message back to a single viewer or all viewers
-	SendBroadcast(context.Context, *BroadcastRequest) (*BroadcastResponse, error)
-	mustEmbedUnimplementedChatServiceServer()
+// Game service
+type GameServiceServer interface {
+	StartGame(context.Context, *StartGameRequest) (*StartGameResponse, error)
+	Tap(context.Context, *TapRequest) (*TapResponse, error)
+	EndGame(context.Context, *EndGameRequest) (*EndGameResponse, error)
+	mustEmbedUnimplementedGameServiceServer()
 }
 
-// UnimplementedChatServiceServer must be embedded to have
+// UnimplementedGameServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedChatServiceServer struct{}
+type UnimplementedGameServiceServer struct{}
 
-func (UnimplementedChatServiceServer) SendMessage(context.Context, *MessageRequest) (*MessageResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
+func (UnimplementedGameServiceServer) StartGame(context.Context, *StartGameRequest) (*StartGameResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartGame not implemented")
 }
-func (UnimplementedChatServiceServer) SendBroadcast(context.Context, *BroadcastRequest) (*BroadcastResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendBroadcast not implemented")
+func (UnimplementedGameServiceServer) Tap(context.Context, *TapRequest) (*TapResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Tap not implemented")
 }
-func (UnimplementedChatServiceServer) mustEmbedUnimplementedChatServiceServer() {}
-func (UnimplementedChatServiceServer) testEmbeddedByValue()                     {}
+func (UnimplementedGameServiceServer) EndGame(context.Context, *EndGameRequest) (*EndGameResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EndGame not implemented")
+}
+func (UnimplementedGameServiceServer) mustEmbedUnimplementedGameServiceServer() {}
+func (UnimplementedGameServiceServer) testEmbeddedByValue()                     {}
 
-// UnsafeChatServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ChatServiceServer will
+// UnsafeGameServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to GameServiceServer will
 // result in compilation errors.
-type UnsafeChatServiceServer interface {
-	mustEmbedUnimplementedChatServiceServer()
+type UnsafeGameServiceServer interface {
+	mustEmbedUnimplementedGameServiceServer()
 }
 
-func RegisterChatServiceServer(s grpc.ServiceRegistrar, srv ChatServiceServer) {
-	// If the following call pancis, it indicates UnimplementedChatServiceServer was
+func RegisterGameServiceServer(s grpc.ServiceRegistrar, srv GameServiceServer) {
+	// If the following call pancis, it indicates UnimplementedGameServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&ChatService_ServiceDesc, srv)
+	s.RegisterService(&GameService_ServiceDesc, srv)
 }
 
-func _ChatService_SendMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MessageRequest)
+func _GameService_StartGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartGameRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ChatServiceServer).SendMessage(ctx, in)
+		return srv.(GameServiceServer).StartGame(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ChatService_SendMessage_FullMethodName,
+		FullMethod: GameService_StartGame_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ChatServiceServer).SendMessage(ctx, req.(*MessageRequest))
+		return srv.(GameServiceServer).StartGame(ctx, req.(*StartGameRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ChatService_SendBroadcast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BroadcastRequest)
+func _GameService_Tap_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TapRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ChatServiceServer).SendBroadcast(ctx, in)
+		return srv.(GameServiceServer).Tap(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ChatService_SendBroadcast_FullMethodName,
+		FullMethod: GameService_Tap_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ChatServiceServer).SendBroadcast(ctx, req.(*BroadcastRequest))
+		return srv.(GameServiceServer).Tap(ctx, req.(*TapRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ChatService_ServiceDesc is the grpc.ServiceDesc for ChatService service.
+func _GameService_EndGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EndGameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServiceServer).EndGame(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameService_EndGame_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServiceServer).EndGame(ctx, req.(*EndGameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// GameService_ServiceDesc is the grpc.ServiceDesc for GameService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ChatService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "chat.ChatService",
-	HandlerType: (*ChatServiceServer)(nil),
+var GameService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "qiba.GameService",
+	HandlerType: (*GameServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SendMessage",
-			Handler:    _ChatService_SendMessage_Handler,
+			MethodName: "StartGame",
+			Handler:    _GameService_StartGame_Handler,
 		},
 		{
-			MethodName: "SendBroadcast",
-			Handler:    _ChatService_SendBroadcast_Handler,
+			MethodName: "Tap",
+			Handler:    _GameService_Tap_Handler,
+		},
+		{
+			MethodName: "EndGame",
+			Handler:    _GameService_EndGame_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
