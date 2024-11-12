@@ -18,11 +18,19 @@ func NewGameServer(service *app.GameService) *GameServer {
 }
 
 func (s *GameServer) StartGame(ctx context.Context, req *proto.StartGameRequest) (*proto.StartGameResponse, error) {
-	encryptedData, hmac, err := s.service.StartGame()
+	encryptedData, hmac, gameID, err := s.service.StartGame()
 	if err != nil {
 		return nil, err
 	}
-	return &proto.StartGameResponse{EncryptedGameData: encryptedData, Hmac: hmac}, nil
+	return &proto.StartGameResponse{EncryptedGameData: encryptedData, Hmac: hmac, GameId: gameID}, nil
+}
+
+func (s *GameServer) Spawn(ctx context.Context, req *proto.SpawnRequest) (*proto.SpawnResponse, error) {
+	data, err := s.service.Spawn(req.GameId)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.SpawnResponse{Data: data}, nil
 }
 
 func (s *GameServer) Tap(ctx context.Context, req *proto.TapRequest) (*proto.TapResponse, error) {

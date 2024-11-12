@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
+	"math/rand"
 )
 
 type Game struct {
@@ -26,18 +28,20 @@ func NewGame() *Game {
 		ID:        uuid.New().String(),
 		StartTime: time.Now(),
 	}
-	game.generateObjectSequence()
+	// game.generateObjectSequence()
 	return game
 }
 
 // Generates a random sequence of objects for the game
-func (g *Game) generateObjectSequence() {
+func (g *Game) GenerateObjectSequence() {
 	// Populate with 10 sample objects
-	for i := 0; i < 10; i++ {
-		g.ObjectSeq = append(g.ObjectSeq, GameObject{
-			ID:        uuid.New().String(),
-			Type:      map[bool]string{true: "a", false: "b"}[i%2 == 0],
-			Timestamp: time.Now().Add(time.Duration(i) * time.Second),
-		})
-	}
+
+	isTypeA := rand.Intn(2) == 0
+
+	g.ObjectSeq = append(g.ObjectSeq, GameObject{
+		ID:        uuid.New().String(),
+		Type:      map[bool]string{true: "a", false: "b"}[isTypeA],
+		Timestamp: time.Now(),
+	})
+
 }

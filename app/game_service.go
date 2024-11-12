@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/bernardbaker/qiba.core/domain"
@@ -16,19 +17,38 @@ func NewGameService(repo ports.GameRepository, encrypter ports.Encrypter) *GameS
 	return &GameService{repo: repo, encrypter: encrypter}
 }
 
-func (s *GameService) StartGame() (string, string, error) {
+func (s *GameService) StartGame() (string, string, string, error) {
 	game := domain.NewGame()
 	err := s.repo.SaveGame(game)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 
 	// Encrypt game data and generate HMAC
 	encryptedData, hmac, err := s.encrypter.EncryptGameData(game.ObjectSeq)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
-	return encryptedData, hmac, nil
+	return encryptedData, hmac, game.ID, nil
+}
+
+func (s *GameService) Spawn(gameID string) (string, error) {
+	game, err := s.repo.GetGame(gameID)
+	if err != nil {
+		return "", err
+	}
+
+	game.GenerateObjectSequence()
+
+	s.repo.SaveGame(game)
+
+	json, err := json.Marshal(game.ObjectSeq[len(game.ObjectSeq)-1])
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(json), nil
 }
 
 func (s *GameService) Tap(gameID, objectID string, timestamp time.Time) (bool, error) {

@@ -261,17 +261,20 @@ service TelegramMiniApp {
 }
 
 // Game service
-service GameService {
-    rpc StartGame (StartGameRequest) returns (StartGameResponse);
-    rpc Tap (TapRequest) returns (TapResponse);
-    rpc EndGame (EndGameRequest) returns (EndGameResponse);
-}
-
 message StartGameRequest {}
 
 message StartGameResponse {
     string encrypted_game_data = 1;
     string hmac = 2;
+    string game_id = 3;
+}
+
+message SpawnRequest {
+    string game_id = 1;
+}
+
+message SpawnResponse {
+    string data = 1;
 }
 
 message TapRequest {
@@ -291,4 +294,10 @@ message EndGameRequest {
 message EndGameResponse {
     int32 score = 1;
 }
-  
+
+service GameService {
+    rpc StartGame (StartGameRequest) returns (StartGameResponse);
+    rpc Spawn (SpawnRequest) returns (SpawnResponse);
+    rpc Tap (TapRequest) returns (TapResponse);
+    rpc EndGame (EndGameRequest) returns (EndGameResponse);
+}

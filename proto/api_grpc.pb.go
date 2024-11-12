@@ -648,6 +648,7 @@ var TelegramMiniApp_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	GameService_StartGame_FullMethodName = "/qiba.GameService/StartGame"
+	GameService_Spawn_FullMethodName     = "/qiba.GameService/Spawn"
 	GameService_Tap_FullMethodName       = "/qiba.GameService/Tap"
 	GameService_EndGame_FullMethodName   = "/qiba.GameService/EndGame"
 )
@@ -655,10 +656,9 @@ const (
 // GameServiceClient is the client API for GameService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// Game service
 type GameServiceClient interface {
 	StartGame(ctx context.Context, in *StartGameRequest, opts ...grpc.CallOption) (*StartGameResponse, error)
+	Spawn(ctx context.Context, in *SpawnRequest, opts ...grpc.CallOption) (*SpawnResponse, error)
 	Tap(ctx context.Context, in *TapRequest, opts ...grpc.CallOption) (*TapResponse, error)
 	EndGame(ctx context.Context, in *EndGameRequest, opts ...grpc.CallOption) (*EndGameResponse, error)
 }
@@ -675,6 +675,16 @@ func (c *gameServiceClient) StartGame(ctx context.Context, in *StartGameRequest,
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(StartGameResponse)
 	err := c.cc.Invoke(ctx, GameService_StartGame_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameServiceClient) Spawn(ctx context.Context, in *SpawnRequest, opts ...grpc.CallOption) (*SpawnResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SpawnResponse)
+	err := c.cc.Invoke(ctx, GameService_Spawn_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -704,10 +714,9 @@ func (c *gameServiceClient) EndGame(ctx context.Context, in *EndGameRequest, opt
 // GameServiceServer is the server API for GameService service.
 // All implementations must embed UnimplementedGameServiceServer
 // for forward compatibility.
-//
-// Game service
 type GameServiceServer interface {
 	StartGame(context.Context, *StartGameRequest) (*StartGameResponse, error)
+	Spawn(context.Context, *SpawnRequest) (*SpawnResponse, error)
 	Tap(context.Context, *TapRequest) (*TapResponse, error)
 	EndGame(context.Context, *EndGameRequest) (*EndGameResponse, error)
 	mustEmbedUnimplementedGameServiceServer()
@@ -722,6 +731,9 @@ type UnimplementedGameServiceServer struct{}
 
 func (UnimplementedGameServiceServer) StartGame(context.Context, *StartGameRequest) (*StartGameResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartGame not implemented")
+}
+func (UnimplementedGameServiceServer) Spawn(context.Context, *SpawnRequest) (*SpawnResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Spawn not implemented")
 }
 func (UnimplementedGameServiceServer) Tap(context.Context, *TapRequest) (*TapResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Tap not implemented")
@@ -764,6 +776,24 @@ func _GameService_StartGame_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GameServiceServer).StartGame(ctx, req.(*StartGameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameService_Spawn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SpawnRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServiceServer).Spawn(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameService_Spawn_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServiceServer).Spawn(ctx, req.(*SpawnRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -814,6 +844,10 @@ var GameService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StartGame",
 			Handler:    _GameService_StartGame_Handler,
+		},
+		{
+			MethodName: "Spawn",
+			Handler:    _GameService_Spawn_Handler,
 		},
 		{
 			MethodName: "Tap",
