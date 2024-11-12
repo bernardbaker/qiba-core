@@ -63,7 +63,7 @@ func (s *GameService) Tap(gameID, objectID string, timestamp time.Time) (bool, e
 			if obj.Type == "a" {
 				game.Score++
 			} else {
-				game.Score--
+				game.Score = game.Score - 5
 			}
 			return true, s.repo.UpdateGame(game)
 		}
