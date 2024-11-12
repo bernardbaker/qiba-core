@@ -64,7 +64,7 @@ func TestStartGame(t *testing.T) {
 		encrypter.On("EncryptGameData", mock.AnythingOfType("[]domain.GameObject")).
 			Return("encrypted_data", "hmac_value", nil)
 
-		encryptedData, hmac, err := service.StartGame()
+		encryptedData, hmac, _, err := service.StartGame()
 
 		assert.NoError(t, err)
 		assert.Equal(t, "encrypted_data", encryptedData)
@@ -81,11 +81,12 @@ func TestStartGame(t *testing.T) {
 		repo.On("SaveGame", mock.AnythingOfType("*domain.Game")).
 			Return(assert.AnError)
 
-		encryptedData, hmac, err := service.StartGame()
+		encryptedData, hmac, gameId, err := service.StartGame()
 
 		assert.Error(t, err)
 		assert.Empty(t, encryptedData)
 		assert.Empty(t, hmac)
+		assert.Empty(t, gameId)
 		repo.AssertExpectations(t)
 	})
 
@@ -98,7 +99,7 @@ func TestStartGame(t *testing.T) {
 		encrypter.On("EncryptGameData", mock.AnythingOfType("[]domain.GameObject")).
 			Return("", "", assert.AnError)
 
-		encryptedData, hmac, err := service.StartGame()
+		encryptedData, hmac, _, err := service.StartGame()
 
 		assert.Error(t, err)
 		assert.Empty(t, encryptedData)
@@ -159,7 +160,7 @@ func TestTap(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.True(t, success)
-		assert.Equal(t, int32(-1), game.Score)
+		assert.Equal(t, int32(-5), game.Score)
 		repo.AssertExpectations(t)
 	})
 
