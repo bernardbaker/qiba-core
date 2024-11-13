@@ -31,10 +31,13 @@ func NewReferral(owner string) *Referral {
 }
 
 // Generates a new referral
-func NewReferralObject(user User) *ReferralObject {
+func NewReferralObject(from User, to User) *ReferralObject {
 	referralObject := &ReferralObject{
-		ID:   uuid.New().String(),
-		From: user,
+		ID:         uuid.New().String(),
+		From:       from,
+		To:         to,
+		AcceptTime: time.Time{},
+		Expired:    true,
 	}
 	return referralObject
 }

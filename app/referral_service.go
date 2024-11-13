@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/bernardbaker/qiba.core/domain"
 	"github.com/bernardbaker/qiba.core/ports"
@@ -52,17 +51,17 @@ func (s *ReferralService) Update(from domain.User, to domain.User) error {
 	if err != nil {
 		return err
 	}
-	// loop through referrals and find one which hasn't been accepted
-	// if it hasn't been accepted, then update it
+	// check the referrals
 	for _, referral := range obj.Referrals {
-		if referral.Expired == false {
-			referral.To = to
-			referral.Expired = true
-			referral.AcceptTime = time.Now()
-			break
+		// if to has already had a referral from from, then skip
+		if referral.To.UserId == to.UserId && referral.From.UserId == from.UserId {
+			fmt.Println("To has already had a referral from From...")
+			return nil
 		}
 	}
-
+	// otherwise, add the new referral
+	obj.Referrals = append(obj.Referrals, *domain.NewReferralObject(from, to))
+	// store the referral
 	updateError := s.repo.Update(obj)
 	if updateError != nil {
 		return updateError

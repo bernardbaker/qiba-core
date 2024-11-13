@@ -92,6 +92,8 @@ func (s *ReferralServer) AcceptReferral(ctx context.Context, req *proto.AcceptRe
 		IsBot:        req.To.IsBot,
 	}
 	err := s.service.Update(from, to)
+	// debugging
+	fmt.Println(s.service.Get(strconv.FormatInt(req.From.UserId, 10)))
 	if err != nil {
 		return nil, err
 	}
