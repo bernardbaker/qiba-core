@@ -861,3 +861,143 @@ var GameService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "api.proto",
 }
+
+const (
+	ReferralService_Referral_FullMethodName       = "/qiba.ReferralService/Referral"
+	ReferralService_AcceptReferral_FullMethodName = "/qiba.ReferralService/AcceptReferral"
+)
+
+// ReferralServiceClient is the client API for ReferralService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type ReferralServiceClient interface {
+	Referral(ctx context.Context, in *ReferralRequest, opts ...grpc.CallOption) (*ReferralResponse, error)
+	AcceptReferral(ctx context.Context, in *AcceptReferralRequest, opts ...grpc.CallOption) (*AcceptReferralResponse, error)
+}
+
+type referralServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewReferralServiceClient(cc grpc.ClientConnInterface) ReferralServiceClient {
+	return &referralServiceClient{cc}
+}
+
+func (c *referralServiceClient) Referral(ctx context.Context, in *ReferralRequest, opts ...grpc.CallOption) (*ReferralResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ReferralResponse)
+	err := c.cc.Invoke(ctx, ReferralService_Referral_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *referralServiceClient) AcceptReferral(ctx context.Context, in *AcceptReferralRequest, opts ...grpc.CallOption) (*AcceptReferralResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AcceptReferralResponse)
+	err := c.cc.Invoke(ctx, ReferralService_AcceptReferral_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ReferralServiceServer is the server API for ReferralService service.
+// All implementations must embed UnimplementedReferralServiceServer
+// for forward compatibility.
+type ReferralServiceServer interface {
+	Referral(context.Context, *ReferralRequest) (*ReferralResponse, error)
+	AcceptReferral(context.Context, *AcceptReferralRequest) (*AcceptReferralResponse, error)
+	mustEmbedUnimplementedReferralServiceServer()
+}
+
+// UnimplementedReferralServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedReferralServiceServer struct{}
+
+func (UnimplementedReferralServiceServer) Referral(context.Context, *ReferralRequest) (*ReferralResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Referral not implemented")
+}
+func (UnimplementedReferralServiceServer) AcceptReferral(context.Context, *AcceptReferralRequest) (*AcceptReferralResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AcceptReferral not implemented")
+}
+func (UnimplementedReferralServiceServer) mustEmbedUnimplementedReferralServiceServer() {}
+func (UnimplementedReferralServiceServer) testEmbeddedByValue()                         {}
+
+// UnsafeReferralServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ReferralServiceServer will
+// result in compilation errors.
+type UnsafeReferralServiceServer interface {
+	mustEmbedUnimplementedReferralServiceServer()
+}
+
+func RegisterReferralServiceServer(s grpc.ServiceRegistrar, srv ReferralServiceServer) {
+	// If the following call pancis, it indicates UnimplementedReferralServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&ReferralService_ServiceDesc, srv)
+}
+
+func _ReferralService_Referral_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReferralRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReferralServiceServer).Referral(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReferralService_Referral_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReferralServiceServer).Referral(ctx, req.(*ReferralRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ReferralService_AcceptReferral_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AcceptReferralRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReferralServiceServer).AcceptReferral(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReferralService_AcceptReferral_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReferralServiceServer).AcceptReferral(ctx, req.(*AcceptReferralRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// ReferralService_ServiceDesc is the grpc.ServiceDesc for ReferralService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var ReferralService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "qiba.ReferralService",
+	HandlerType: (*ReferralServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Referral",
+			Handler:    _ReferralService_Referral_Handler,
+		},
+		{
+			MethodName: "AcceptReferral",
+			Handler:    _ReferralService_AcceptReferral_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "api.proto",
+}

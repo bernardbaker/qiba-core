@@ -17,9 +17,16 @@ func main() {
 	encrypter := infrastructure.NewEncrypter([]byte("mysecretencryptionkey1234567890a"))
 	service := app.NewGameService(repo, encrypter)
 
+	// Initialize the referral repository and referral service
+	referralRepo := infrastructure.NewInMemoryReferralRepository()
+	referralService := app.NewReferralService(referralRepo)
+
 	// Setup and start gRPC server
 	server := grpc.NewServer()
+	// Register game service
 	proto.RegisterGameServiceServer(server, infrastructure.NewGameServer(service))
+	// Register referral service
+	proto.RegisterReferralServiceServer(server, infrastructure.NewReferralServer(referralService))
 
 	listener, err := net.Listen("tcp", ":50051")
 	if err != nil {

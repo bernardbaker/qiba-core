@@ -295,9 +295,33 @@ message EndGameResponse {
     int32 score = 1;
 }
 
+message ReferralRequest {
+    User user = 1;
+    string timestamp = 2;
+}
+
+message ReferralResponse {
+    bool success = 1;
+}
+
+message AcceptReferralRequest {
+    User from = 1;
+    User to = 2;
+    string timestamp = 3;
+}
+
+message AcceptReferralResponse {
+    bool success = 1;
+}
+
 service GameService {
     rpc StartGame (StartGameRequest) returns (StartGameResponse);
     rpc Spawn (SpawnRequest) returns (SpawnResponse);
     rpc Tap (TapRequest) returns (TapResponse);
     rpc EndGame (EndGameRequest) returns (EndGameResponse);
+}
+
+service ReferralService {
+    rpc Referral (ReferralRequest) returns (ReferralResponse);
+    rpc AcceptReferral (AcceptReferralRequest) returns (AcceptReferralResponse);
 }

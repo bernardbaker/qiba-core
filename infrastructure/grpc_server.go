@@ -2,9 +2,12 @@ package infrastructure
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/bernardbaker/qiba.core/app"
+	"github.com/bernardbaker/qiba.core/domain"
 	"github.com/bernardbaker/qiba.core/proto"
 )
 
@@ -48,4 +51,49 @@ func (s *GameServer) EndGame(ctx context.Context, req *proto.EndGameRequest) (*p
 		return nil, err
 	}
 	return &proto.EndGameResponse{Score: score}, nil
+}
+
+type ReferralServer struct {
+	proto.UnimplementedReferralServiceServer
+	service *app.ReferralService
+}
+
+func NewReferralServer(service *app.ReferralService) *ReferralServer {
+	return &ReferralServer{service: service}
+}
+
+func (s *ReferralServer) Referral(ctx context.Context, req *proto.ReferralRequest) (*proto.ReferralResponse, error) {
+	fmt.Println("req.User", req.User)
+	err := s.service.Create(req.User.UserId)
+	if err != nil {
+		return nil, err
+	}
+	// debugging
+	fmt.Println(s.service.Get(strconv.FormatInt(req.User.UserId, 10)))
+	//
+	return &proto.ReferralResponse{Success: true}, nil
+}
+
+func (s *ReferralServer) AcceptReferral(ctx context.Context, req *proto.AcceptReferralRequest) (*proto.AcceptReferralResponse, error) {
+	from := domain.User{
+		UserId:       req.From.UserId,
+		Username:     req.From.Username,
+		FirstName:    req.From.FirstName,
+		LastName:     req.From.LastName,
+		LanguageCode: req.From.LanguageCode,
+		IsBot:        req.From.IsBot,
+	}
+	to := domain.User{
+		UserId:       req.To.UserId,
+		Username:     req.To.Username,
+		FirstName:    req.To.FirstName,
+		LastName:     req.To.LastName,
+		LanguageCode: req.To.LanguageCode,
+		IsBot:        req.To.IsBot,
+	}
+	err := s.service.Update(from, to)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.AcceptReferralResponse{Success: true}, nil
 }
