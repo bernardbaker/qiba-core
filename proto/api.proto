@@ -12,6 +12,7 @@ message User {
     string last_name = 4;
     string language_code = 5;
     bool is_bot = 6; // Whether the user is a bot or not
+    int64 bonus_games = 7;
 }
 
 // Represents a simple text message
@@ -314,11 +315,32 @@ message AcceptReferralResponse {
     bool success = 1;
 }
 
+message CanPlayGameRequest {
+    User user = 1;
+    string timestamp = 2;
+}
+
+message CanPlayGameResponse {
+    bool success = 1;
+}
+
+message RedeemBonusGameRequest {
+    User user = 1;
+    string timestamp = 3;
+}
+
+message RedeemBonusGameResponse {
+    bool success = 1;
+    int64 count = 2;
+}
+
 service GameService {
     rpc StartGame (StartGameRequest) returns (StartGameResponse);
     rpc Spawn (SpawnRequest) returns (SpawnResponse);
     rpc Tap (TapRequest) returns (TapResponse);
     rpc EndGame (EndGameRequest) returns (EndGameResponse);
+    rpc GanPlay (CanPlayGameRequest) returns (CanPlayGameResponse);
+    rpc RedeemBonusGame (RedeemBonusGameRequest) returns (RedeemBonusGameResponse);
 }
 
 service ReferralService {

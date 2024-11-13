@@ -647,10 +647,12 @@ var TelegramMiniApp_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	GameService_StartGame_FullMethodName = "/qiba.GameService/StartGame"
-	GameService_Spawn_FullMethodName     = "/qiba.GameService/Spawn"
-	GameService_Tap_FullMethodName       = "/qiba.GameService/Tap"
-	GameService_EndGame_FullMethodName   = "/qiba.GameService/EndGame"
+	GameService_StartGame_FullMethodName       = "/qiba.GameService/StartGame"
+	GameService_Spawn_FullMethodName           = "/qiba.GameService/Spawn"
+	GameService_Tap_FullMethodName             = "/qiba.GameService/Tap"
+	GameService_EndGame_FullMethodName         = "/qiba.GameService/EndGame"
+	GameService_GanPlay_FullMethodName         = "/qiba.GameService/GanPlay"
+	GameService_RedeemBonusGame_FullMethodName = "/qiba.GameService/RedeemBonusGame"
 )
 
 // GameServiceClient is the client API for GameService service.
@@ -661,6 +663,8 @@ type GameServiceClient interface {
 	Spawn(ctx context.Context, in *SpawnRequest, opts ...grpc.CallOption) (*SpawnResponse, error)
 	Tap(ctx context.Context, in *TapRequest, opts ...grpc.CallOption) (*TapResponse, error)
 	EndGame(ctx context.Context, in *EndGameRequest, opts ...grpc.CallOption) (*EndGameResponse, error)
+	GanPlay(ctx context.Context, in *CanPlayGameRequest, opts ...grpc.CallOption) (*CanPlayGameResponse, error)
+	RedeemBonusGame(ctx context.Context, in *RedeemBonusGameRequest, opts ...grpc.CallOption) (*RedeemBonusGameResponse, error)
 }
 
 type gameServiceClient struct {
@@ -711,6 +715,26 @@ func (c *gameServiceClient) EndGame(ctx context.Context, in *EndGameRequest, opt
 	return out, nil
 }
 
+func (c *gameServiceClient) GanPlay(ctx context.Context, in *CanPlayGameRequest, opts ...grpc.CallOption) (*CanPlayGameResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CanPlayGameResponse)
+	err := c.cc.Invoke(ctx, GameService_GanPlay_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameServiceClient) RedeemBonusGame(ctx context.Context, in *RedeemBonusGameRequest, opts ...grpc.CallOption) (*RedeemBonusGameResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RedeemBonusGameResponse)
+	err := c.cc.Invoke(ctx, GameService_RedeemBonusGame_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GameServiceServer is the server API for GameService service.
 // All implementations must embed UnimplementedGameServiceServer
 // for forward compatibility.
@@ -719,6 +743,8 @@ type GameServiceServer interface {
 	Spawn(context.Context, *SpawnRequest) (*SpawnResponse, error)
 	Tap(context.Context, *TapRequest) (*TapResponse, error)
 	EndGame(context.Context, *EndGameRequest) (*EndGameResponse, error)
+	GanPlay(context.Context, *CanPlayGameRequest) (*CanPlayGameResponse, error)
+	RedeemBonusGame(context.Context, *RedeemBonusGameRequest) (*RedeemBonusGameResponse, error)
 	mustEmbedUnimplementedGameServiceServer()
 }
 
@@ -740,6 +766,12 @@ func (UnimplementedGameServiceServer) Tap(context.Context, *TapRequest) (*TapRes
 }
 func (UnimplementedGameServiceServer) EndGame(context.Context, *EndGameRequest) (*EndGameResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EndGame not implemented")
+}
+func (UnimplementedGameServiceServer) GanPlay(context.Context, *CanPlayGameRequest) (*CanPlayGameResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GanPlay not implemented")
+}
+func (UnimplementedGameServiceServer) RedeemBonusGame(context.Context, *RedeemBonusGameRequest) (*RedeemBonusGameResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RedeemBonusGame not implemented")
 }
 func (UnimplementedGameServiceServer) mustEmbedUnimplementedGameServiceServer() {}
 func (UnimplementedGameServiceServer) testEmbeddedByValue()                     {}
@@ -834,6 +866,42 @@ func _GameService_EndGame_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GameService_GanPlay_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CanPlayGameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServiceServer).GanPlay(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameService_GanPlay_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServiceServer).GanPlay(ctx, req.(*CanPlayGameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameService_RedeemBonusGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RedeemBonusGameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServiceServer).RedeemBonusGame(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameService_RedeemBonusGame_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServiceServer).RedeemBonusGame(ctx, req.(*RedeemBonusGameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GameService_ServiceDesc is the grpc.ServiceDesc for GameService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -856,6 +924,14 @@ var GameService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EndGame",
 			Handler:    _GameService_EndGame_Handler,
+		},
+		{
+			MethodName: "GanPlay",
+			Handler:    _GameService_GanPlay_Handler,
+		},
+		{
+			MethodName: "RedeemBonusGame",
+			Handler:    _GameService_RedeemBonusGame_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
