@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -83,7 +82,6 @@ func (s *GameService) EndGame(gameID string) (int32, error) {
 		game.Score = 0
 	}
 	game.EndTime = time.Now()
-	fmt.Println("EndGame game.EndTime = time.Now()", game.EndTime)
 	return game.Score, updateError
 }
 

@@ -939,8 +939,9 @@ var GameService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	ReferralService_Referral_FullMethodName       = "/qiba.ReferralService/Referral"
-	ReferralService_AcceptReferral_FullMethodName = "/qiba.ReferralService/AcceptReferral"
+	ReferralService_Referral_FullMethodName           = "/qiba.ReferralService/Referral"
+	ReferralService_AcceptReferral_FullMethodName     = "/qiba.ReferralService/AcceptReferral"
+	ReferralService_ReferralStatistics_FullMethodName = "/qiba.ReferralService/ReferralStatistics"
 )
 
 // ReferralServiceClient is the client API for ReferralService service.
@@ -949,6 +950,7 @@ const (
 type ReferralServiceClient interface {
 	Referral(ctx context.Context, in *ReferralRequest, opts ...grpc.CallOption) (*ReferralResponse, error)
 	AcceptReferral(ctx context.Context, in *AcceptReferralRequest, opts ...grpc.CallOption) (*AcceptReferralResponse, error)
+	ReferralStatistics(ctx context.Context, in *ReferralStatisticsRequest, opts ...grpc.CallOption) (*ReferralStatisticsResponse, error)
 }
 
 type referralServiceClient struct {
@@ -979,12 +981,23 @@ func (c *referralServiceClient) AcceptReferral(ctx context.Context, in *AcceptRe
 	return out, nil
 }
 
+func (c *referralServiceClient) ReferralStatistics(ctx context.Context, in *ReferralStatisticsRequest, opts ...grpc.CallOption) (*ReferralStatisticsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ReferralStatisticsResponse)
+	err := c.cc.Invoke(ctx, ReferralService_ReferralStatistics_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReferralServiceServer is the server API for ReferralService service.
 // All implementations must embed UnimplementedReferralServiceServer
 // for forward compatibility.
 type ReferralServiceServer interface {
 	Referral(context.Context, *ReferralRequest) (*ReferralResponse, error)
 	AcceptReferral(context.Context, *AcceptReferralRequest) (*AcceptReferralResponse, error)
+	ReferralStatistics(context.Context, *ReferralStatisticsRequest) (*ReferralStatisticsResponse, error)
 	mustEmbedUnimplementedReferralServiceServer()
 }
 
@@ -1000,6 +1013,9 @@ func (UnimplementedReferralServiceServer) Referral(context.Context, *ReferralReq
 }
 func (UnimplementedReferralServiceServer) AcceptReferral(context.Context, *AcceptReferralRequest) (*AcceptReferralResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AcceptReferral not implemented")
+}
+func (UnimplementedReferralServiceServer) ReferralStatistics(context.Context, *ReferralStatisticsRequest) (*ReferralStatisticsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReferralStatistics not implemented")
 }
 func (UnimplementedReferralServiceServer) mustEmbedUnimplementedReferralServiceServer() {}
 func (UnimplementedReferralServiceServer) testEmbeddedByValue()                         {}
@@ -1058,6 +1074,24 @@ func _ReferralService_AcceptReferral_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReferralService_ReferralStatistics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReferralStatisticsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReferralServiceServer).ReferralStatistics(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReferralService_ReferralStatistics_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReferralServiceServer).ReferralStatistics(ctx, req.(*ReferralStatisticsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ReferralService_ServiceDesc is the grpc.ServiceDesc for ReferralService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1072,6 +1106,10 @@ var ReferralService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AcceptReferral",
 			Handler:    _ReferralService_AcceptReferral_Handler,
+		},
+		{
+			MethodName: "ReferralStatistics",
+			Handler:    _ReferralService_ReferralStatistics_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

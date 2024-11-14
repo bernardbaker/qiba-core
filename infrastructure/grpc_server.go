@@ -21,9 +21,6 @@ func NewGameServer(service *app.GameService) *GameServer {
 }
 
 func (s *GameServer) StartGame(ctx context.Context, req *proto.StartGameRequest) (*proto.StartGameResponse, error) {
-	// debugging
-	fmt.Println("StartGame req.User", req.User)
-	//
 	id := strconv.FormatInt(req.User.UserId, 10)
 	encryptedData, hmac, gameID, err := s.service.StartGame(id)
 	if err != nil {
@@ -64,15 +61,10 @@ func (s *GameServer) CanPlay(ctx context.Context, req *proto.CanPlayGameRequest)
 		fmt.Println(err)
 		return &proto.CanPlayGameResponse{Success: false}, nil
 	}
-	// debugging
-	fmt.Println("req.User", req.User)
-	fmt.Println("req.Timestamp", req.Timestamp)
-	//
 	user := domain.User{
 		UserId: req.User.UserId,
 	}
 	timestamp := time.UnixMilli(milliseconds).UTC()
-	fmt.Println("time.UnixMilli(milliseconds).UTC()", timestamp)
 	success := s.service.CanPlay(user, timestamp)
 	return &proto.CanPlayGameResponse{Success: success}, nil
 }
@@ -122,4 +114,13 @@ func (s *ReferralServer) AcceptReferral(ctx context.Context, req *proto.AcceptRe
 		return nil, err
 	}
 	return &proto.AcceptReferralResponse{Success: true}, nil
+}
+
+func (s *ReferralServer) ReferralStatistics(ctx context.Context, req *proto.ReferralStatisticsRequest) (*proto.ReferralStatisticsResponse, error) {
+	objects, err := s.service.Get(strconv.FormatInt(req.User.UserId, 10))
+	if err != nil {
+		return nil, err
+	}
+	count := int64(len(objects.Referrals))
+	return &proto.ReferralStatisticsResponse{Success: true, Count: count}, nil
 }

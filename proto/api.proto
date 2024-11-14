@@ -336,6 +336,15 @@ message RedeemBonusGameResponse {
     int64 count = 2;
 }
 
+message ReferralStatisticsRequest {
+    User user = 1;
+}
+
+message ReferralStatisticsResponse {
+    bool success = 1;
+    int64 count = 2;
+}
+
 service GameService {
     rpc StartGame (StartGameRequest) returns (StartGameResponse);
     rpc Spawn (SpawnRequest) returns (SpawnResponse);
@@ -348,4 +357,5 @@ service GameService {
 service ReferralService {
     rpc Referral (ReferralRequest) returns (ReferralResponse);
     rpc AcceptReferral (AcceptReferralRequest) returns (AcceptReferralResponse);
+    rpc ReferralStatistics (ReferralStatisticsRequest) returns (ReferralStatisticsResponse);
 }
