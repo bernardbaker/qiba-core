@@ -262,7 +262,9 @@ service TelegramMiniApp {
 }
 
 // Game service
-message StartGameRequest {}
+message StartGameRequest {
+    User user = 1;
+}
 
 message StartGameResponse {
     string encrypted_game_data = 1;
@@ -339,7 +341,7 @@ service GameService {
     rpc Spawn (SpawnRequest) returns (SpawnResponse);
     rpc Tap (TapRequest) returns (TapResponse);
     rpc EndGame (EndGameRequest) returns (EndGameResponse);
-    rpc GanPlay (CanPlayGameRequest) returns (CanPlayGameResponse);
+    rpc CanPlay (CanPlayGameRequest) returns (CanPlayGameResponse);
     rpc RedeemBonusGame (RedeemBonusGameRequest) returns (RedeemBonusGameResponse);
 }
 

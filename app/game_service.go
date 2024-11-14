@@ -2,6 +2,8 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/bernardbaker/qiba.core/domain"
@@ -17,8 +19,8 @@ func NewGameService(repo ports.GameRepository, encrypter ports.Encrypter) *GameS
 	return &GameService{repo: repo, encrypter: encrypter}
 }
 
-func (s *GameService) StartGame() (string, string, string, error) {
-	game := domain.NewGame()
+func (s *GameService) StartGame(userId string) (string, string, string, error) {
+	game := domain.NewGame(userId)
 	err := s.repo.SaveGame(game)
 	if err != nil {
 		return "", "", "", err
@@ -81,5 +83,20 @@ func (s *GameService) EndGame(gameID string) (int32, error) {
 		game.Score = 0
 	}
 	game.EndTime = time.Now()
+	fmt.Println("EndGame game.EndTime = time.Now()", game.EndTime)
 	return game.Score, updateError
+}
+
+func (s *GameService) CanPlay(user domain.User, timestamp time.Time) bool {
+	// get all games for user
+	games, err := s.repo.GetGamesByUser(strconv.FormatInt(user.UserId, 10))
+	if err != nil {
+		return false
+	}
+	// check if the last game was played more than 24 hours ago
+	// if so, return true
+	if len(games) == 0 {
+		return true
+	}
+	return timestamp.After(games[len(games)-1].EndTime.Add(30 * time.Second))
 }

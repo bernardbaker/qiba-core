@@ -21,7 +21,11 @@ func NewGameServer(service *app.GameService) *GameServer {
 }
 
 func (s *GameServer) StartGame(ctx context.Context, req *proto.StartGameRequest) (*proto.StartGameResponse, error) {
-	encryptedData, hmac, gameID, err := s.service.StartGame()
+	// debugging
+	fmt.Println("StartGame req.User", req.User)
+	//
+	id := strconv.FormatInt(req.User.UserId, 10)
+	encryptedData, hmac, gameID, err := s.service.StartGame(id)
 	if err != nil {
 		return nil, err
 	}
@@ -51,6 +55,26 @@ func (s *GameServer) EndGame(ctx context.Context, req *proto.EndGameRequest) (*p
 		return nil, err
 	}
 	return &proto.EndGameResponse{Score: score}, nil
+}
+
+func (s *GameServer) CanPlay(ctx context.Context, req *proto.CanPlayGameRequest) (*proto.CanPlayGameResponse, error) {
+	// Convert string to int64 first if req.Timestamp is a string
+	milliseconds, err := strconv.ParseInt(req.Timestamp, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		return &proto.CanPlayGameResponse{Success: false}, nil
+	}
+	// debugging
+	fmt.Println("req.User", req.User)
+	fmt.Println("req.Timestamp", req.Timestamp)
+	//
+	user := domain.User{
+		UserId: req.User.UserId,
+	}
+	timestamp := time.UnixMilli(milliseconds).UTC()
+	fmt.Println("time.UnixMilli(milliseconds).UTC()", timestamp)
+	success := s.service.CanPlay(user, timestamp)
+	return &proto.CanPlayGameResponse{Success: success}, nil
 }
 
 type ReferralServer struct {

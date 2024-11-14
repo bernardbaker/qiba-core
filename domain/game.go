@@ -14,6 +14,7 @@ type Game struct {
 	ObjectSeq []GameObject
 	StartTime time.Time
 	EndTime   time.Time
+	UserID    string
 }
 
 type GameObject struct {
@@ -23,10 +24,11 @@ type GameObject struct {
 }
 
 // Generate a new game with random object sequence
-func NewGame() *Game {
+func NewGame(userId string) *Game {
 	game := &Game{
 		ID:        uuid.New().String(),
 		StartTime: time.Now(),
+		UserID:    userId,
 	}
 	// game.generateObjectSequence()
 	return game

@@ -1960,6 +1960,8 @@ type StartGameRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	User *User `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
 }
 
 func (x *StartGameRequest) Reset() {
@@ -1990,6 +1992,13 @@ func (x *StartGameRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use StartGameRequest.ProtoReflect.Descriptor instead.
 func (*StartGameRequest) Descriptor() ([]byte, []int) {
 	return file_api_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *StartGameRequest) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
 }
 
 type StartGameResponse struct {
@@ -2957,8 +2966,10 @@ var file_api_proto_rawDesc = []byte{
 	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x4d, 0x65,
 	0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x61, 0x79, 0x6d, 0x65, 0x6e, 0x74,
 	0x5f, 0x75, 0x72, 0x6c, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x61, 0x79, 0x6d,
-	0x65, 0x6e, 0x74, 0x55, 0x72, 0x6c, 0x22, 0x12, 0x0a, 0x10, 0x53, 0x74, 0x61, 0x72, 0x74, 0x47,
-	0x61, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x70, 0x0a, 0x11, 0x53, 0x74,
+	0x65, 0x6e, 0x74, 0x55, 0x72, 0x6c, 0x22, 0x32, 0x0a, 0x10, 0x53, 0x74, 0x61, 0x72, 0x74, 0x47,
+	0x61, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1e, 0x0a, 0x04, 0x75, 0x73,
+	0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x71, 0x69, 0x62, 0x61, 0x2e,
+	0x55, 0x73, 0x65, 0x72, 0x52, 0x04, 0x75, 0x73, 0x65, 0x72, 0x22, 0x70, 0x0a, 0x11, 0x53, 0x74,
 	0x61, 0x72, 0x74, 0x47, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
 	0x2e, 0x0a, 0x13, 0x65, 0x6e, 0x63, 0x72, 0x79, 0x70, 0x74, 0x65, 0x64, 0x5f, 0x67, 0x61, 0x6d,
 	0x65, 0x5f, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x11, 0x65, 0x6e,
@@ -3098,7 +3109,7 @@ var file_api_proto_rawDesc = []byte{
 	0x14, 0x2e, 0x71, 0x69, 0x62, 0x61, 0x2e, 0x45, 0x6e, 0x64, 0x47, 0x61, 0x6d, 0x65, 0x52, 0x65,
 	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x15, 0x2e, 0x71, 0x69, 0x62, 0x61, 0x2e, 0x45, 0x6e, 0x64,
 	0x47, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3e, 0x0a, 0x07,
-	0x47, 0x61, 0x6e, 0x50, 0x6c, 0x61, 0x79, 0x12, 0x18, 0x2e, 0x71, 0x69, 0x62, 0x61, 0x2e, 0x43,
+	0x43, 0x61, 0x6e, 0x50, 0x6c, 0x61, 0x79, 0x12, 0x18, 0x2e, 0x71, 0x69, 0x62, 0x61, 0x2e, 0x43,
 	0x61, 0x6e, 0x50, 0x6c, 0x61, 0x79, 0x47, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
 	0x74, 0x1a, 0x19, 0x2e, 0x71, 0x69, 0x62, 0x61, 0x2e, 0x43, 0x61, 0x6e, 0x50, 0x6c, 0x61, 0x79,
 	0x47, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4e, 0x0a, 0x0f,
@@ -3195,60 +3206,61 @@ var file_api_proto_depIdxs = []int32{
 	1,  // 7: qiba.SendMediaMessageResponse.message:type_name -> qiba.Message
 	20, // 8: qiba.GetBotInfoResponse.bot_info:type_name -> qiba.BotInfo
 	30, // 9: qiba.ProcessPaymentRequest.payment_info:type_name -> qiba.PaymentInfo
-	0,  // 10: qiba.ReferralRequest.user:type_name -> qiba.User
-	0,  // 11: qiba.AcceptReferralRequest.from:type_name -> qiba.User
-	0,  // 12: qiba.AcceptReferralRequest.to:type_name -> qiba.User
-	0,  // 13: qiba.CanPlayGameRequest.user:type_name -> qiba.User
-	0,  // 14: qiba.RedeemBonusGameRequest.user:type_name -> qiba.User
-	11, // 15: qiba.TelegramMiniApp.InitData:input_type -> qiba.InitDataRequest
-	4,  // 16: qiba.TelegramMiniApp.SendMessage:input_type -> qiba.SendMessageRequest
-	7,  // 17: qiba.TelegramMiniApp.GetUserInfo:input_type -> qiba.GetUserInfoRequest
-	9,  // 18: qiba.TelegramMiniApp.CreateChat:input_type -> qiba.CreateChatRequest
-	5,  // 19: qiba.TelegramMiniApp.GetChatsForUser:input_type -> qiba.GetChatsForUserRequest
-	6,  // 20: qiba.TelegramMiniApp.GetMessagesFromChat:input_type -> qiba.GetMessagesFromChatRequest
-	15, // 21: qiba.TelegramMiniApp.SendMediaMessage:input_type -> qiba.SendMediaMessageRequest
-	17, // 22: qiba.TelegramMiniApp.DeleteMessage:input_type -> qiba.DeleteMessageRequest
-	19, // 23: qiba.TelegramMiniApp.GetBotInfo:input_type -> qiba.GetBotInfoRequest
-	22, // 24: qiba.TelegramMiniApp.JoinChat:input_type -> qiba.JoinChatRequest
-	24, // 25: qiba.TelegramMiniApp.LeaveChat:input_type -> qiba.LeaveChatRequest
-	26, // 26: qiba.TelegramMiniApp.PinMessage:input_type -> qiba.PinMessageRequest
-	28, // 27: qiba.TelegramMiniApp.UnpinMessage:input_type -> qiba.UnpinMessageRequest
-	31, // 28: qiba.TelegramMiniApp.ProcessPayment:input_type -> qiba.ProcessPaymentRequest
-	33, // 29: qiba.GameService.StartGame:input_type -> qiba.StartGameRequest
-	35, // 30: qiba.GameService.Spawn:input_type -> qiba.SpawnRequest
-	37, // 31: qiba.GameService.Tap:input_type -> qiba.TapRequest
-	39, // 32: qiba.GameService.EndGame:input_type -> qiba.EndGameRequest
-	45, // 33: qiba.GameService.GanPlay:input_type -> qiba.CanPlayGameRequest
-	47, // 34: qiba.GameService.RedeemBonusGame:input_type -> qiba.RedeemBonusGameRequest
-	41, // 35: qiba.ReferralService.Referral:input_type -> qiba.ReferralRequest
-	43, // 36: qiba.ReferralService.AcceptReferral:input_type -> qiba.AcceptReferralRequest
-	12, // 37: qiba.TelegramMiniApp.InitData:output_type -> qiba.InitDataResponse
-	3,  // 38: qiba.TelegramMiniApp.SendMessage:output_type -> qiba.SendMessageResponse
-	8,  // 39: qiba.TelegramMiniApp.GetUserInfo:output_type -> qiba.GetUserInfoResponse
-	10, // 40: qiba.TelegramMiniApp.CreateChat:output_type -> qiba.CreateChatResponse
-	13, // 41: qiba.TelegramMiniApp.GetChatsForUser:output_type -> qiba.GetChatsResponse
-	14, // 42: qiba.TelegramMiniApp.GetMessagesFromChat:output_type -> qiba.GetMessagesResponse
-	16, // 43: qiba.TelegramMiniApp.SendMediaMessage:output_type -> qiba.SendMediaMessageResponse
-	18, // 44: qiba.TelegramMiniApp.DeleteMessage:output_type -> qiba.DeleteMessageResponse
-	21, // 45: qiba.TelegramMiniApp.GetBotInfo:output_type -> qiba.GetBotInfoResponse
-	23, // 46: qiba.TelegramMiniApp.JoinChat:output_type -> qiba.JoinChatResponse
-	25, // 47: qiba.TelegramMiniApp.LeaveChat:output_type -> qiba.LeaveChatResponse
-	27, // 48: qiba.TelegramMiniApp.PinMessage:output_type -> qiba.PinMessageResponse
-	29, // 49: qiba.TelegramMiniApp.UnpinMessage:output_type -> qiba.UnpinMessageResponse
-	32, // 50: qiba.TelegramMiniApp.ProcessPayment:output_type -> qiba.ProcessPaymentResponse
-	34, // 51: qiba.GameService.StartGame:output_type -> qiba.StartGameResponse
-	36, // 52: qiba.GameService.Spawn:output_type -> qiba.SpawnResponse
-	38, // 53: qiba.GameService.Tap:output_type -> qiba.TapResponse
-	40, // 54: qiba.GameService.EndGame:output_type -> qiba.EndGameResponse
-	46, // 55: qiba.GameService.GanPlay:output_type -> qiba.CanPlayGameResponse
-	48, // 56: qiba.GameService.RedeemBonusGame:output_type -> qiba.RedeemBonusGameResponse
-	42, // 57: qiba.ReferralService.Referral:output_type -> qiba.ReferralResponse
-	44, // 58: qiba.ReferralService.AcceptReferral:output_type -> qiba.AcceptReferralResponse
-	37, // [37:59] is the sub-list for method output_type
-	15, // [15:37] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	0,  // 10: qiba.StartGameRequest.user:type_name -> qiba.User
+	0,  // 11: qiba.ReferralRequest.user:type_name -> qiba.User
+	0,  // 12: qiba.AcceptReferralRequest.from:type_name -> qiba.User
+	0,  // 13: qiba.AcceptReferralRequest.to:type_name -> qiba.User
+	0,  // 14: qiba.CanPlayGameRequest.user:type_name -> qiba.User
+	0,  // 15: qiba.RedeemBonusGameRequest.user:type_name -> qiba.User
+	11, // 16: qiba.TelegramMiniApp.InitData:input_type -> qiba.InitDataRequest
+	4,  // 17: qiba.TelegramMiniApp.SendMessage:input_type -> qiba.SendMessageRequest
+	7,  // 18: qiba.TelegramMiniApp.GetUserInfo:input_type -> qiba.GetUserInfoRequest
+	9,  // 19: qiba.TelegramMiniApp.CreateChat:input_type -> qiba.CreateChatRequest
+	5,  // 20: qiba.TelegramMiniApp.GetChatsForUser:input_type -> qiba.GetChatsForUserRequest
+	6,  // 21: qiba.TelegramMiniApp.GetMessagesFromChat:input_type -> qiba.GetMessagesFromChatRequest
+	15, // 22: qiba.TelegramMiniApp.SendMediaMessage:input_type -> qiba.SendMediaMessageRequest
+	17, // 23: qiba.TelegramMiniApp.DeleteMessage:input_type -> qiba.DeleteMessageRequest
+	19, // 24: qiba.TelegramMiniApp.GetBotInfo:input_type -> qiba.GetBotInfoRequest
+	22, // 25: qiba.TelegramMiniApp.JoinChat:input_type -> qiba.JoinChatRequest
+	24, // 26: qiba.TelegramMiniApp.LeaveChat:input_type -> qiba.LeaveChatRequest
+	26, // 27: qiba.TelegramMiniApp.PinMessage:input_type -> qiba.PinMessageRequest
+	28, // 28: qiba.TelegramMiniApp.UnpinMessage:input_type -> qiba.UnpinMessageRequest
+	31, // 29: qiba.TelegramMiniApp.ProcessPayment:input_type -> qiba.ProcessPaymentRequest
+	33, // 30: qiba.GameService.StartGame:input_type -> qiba.StartGameRequest
+	35, // 31: qiba.GameService.Spawn:input_type -> qiba.SpawnRequest
+	37, // 32: qiba.GameService.Tap:input_type -> qiba.TapRequest
+	39, // 33: qiba.GameService.EndGame:input_type -> qiba.EndGameRequest
+	45, // 34: qiba.GameService.CanPlay:input_type -> qiba.CanPlayGameRequest
+	47, // 35: qiba.GameService.RedeemBonusGame:input_type -> qiba.RedeemBonusGameRequest
+	41, // 36: qiba.ReferralService.Referral:input_type -> qiba.ReferralRequest
+	43, // 37: qiba.ReferralService.AcceptReferral:input_type -> qiba.AcceptReferralRequest
+	12, // 38: qiba.TelegramMiniApp.InitData:output_type -> qiba.InitDataResponse
+	3,  // 39: qiba.TelegramMiniApp.SendMessage:output_type -> qiba.SendMessageResponse
+	8,  // 40: qiba.TelegramMiniApp.GetUserInfo:output_type -> qiba.GetUserInfoResponse
+	10, // 41: qiba.TelegramMiniApp.CreateChat:output_type -> qiba.CreateChatResponse
+	13, // 42: qiba.TelegramMiniApp.GetChatsForUser:output_type -> qiba.GetChatsResponse
+	14, // 43: qiba.TelegramMiniApp.GetMessagesFromChat:output_type -> qiba.GetMessagesResponse
+	16, // 44: qiba.TelegramMiniApp.SendMediaMessage:output_type -> qiba.SendMediaMessageResponse
+	18, // 45: qiba.TelegramMiniApp.DeleteMessage:output_type -> qiba.DeleteMessageResponse
+	21, // 46: qiba.TelegramMiniApp.GetBotInfo:output_type -> qiba.GetBotInfoResponse
+	23, // 47: qiba.TelegramMiniApp.JoinChat:output_type -> qiba.JoinChatResponse
+	25, // 48: qiba.TelegramMiniApp.LeaveChat:output_type -> qiba.LeaveChatResponse
+	27, // 49: qiba.TelegramMiniApp.PinMessage:output_type -> qiba.PinMessageResponse
+	29, // 50: qiba.TelegramMiniApp.UnpinMessage:output_type -> qiba.UnpinMessageResponse
+	32, // 51: qiba.TelegramMiniApp.ProcessPayment:output_type -> qiba.ProcessPaymentResponse
+	34, // 52: qiba.GameService.StartGame:output_type -> qiba.StartGameResponse
+	36, // 53: qiba.GameService.Spawn:output_type -> qiba.SpawnResponse
+	38, // 54: qiba.GameService.Tap:output_type -> qiba.TapResponse
+	40, // 55: qiba.GameService.EndGame:output_type -> qiba.EndGameResponse
+	46, // 56: qiba.GameService.CanPlay:output_type -> qiba.CanPlayGameResponse
+	48, // 57: qiba.GameService.RedeemBonusGame:output_type -> qiba.RedeemBonusGameResponse
+	42, // 58: qiba.ReferralService.Referral:output_type -> qiba.ReferralResponse
+	44, // 59: qiba.ReferralService.AcceptReferral:output_type -> qiba.AcceptReferralResponse
+	38, // [38:60] is the sub-list for method output_type
+	16, // [16:38] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_api_proto_init() }

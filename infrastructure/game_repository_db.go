@@ -48,3 +48,16 @@ func (repo *InMemoryGameRepository) UpdateGame(game *domain.Game) error {
 	repo.games[game.ID] = game
 	return nil
 }
+
+// GetGamesByUser
+func (repo *InMemoryGameRepository) GetGamesByUser(userID string) ([]*domain.Game, error) {
+	repo.mutex.RLock()
+	defer repo.mutex.RUnlock()
+	var games []*domain.Game
+	for _, game := range repo.games {
+		if game.UserID == userID {
+			games = append(games, game)
+		}
+	}
+	return games, nil
+}
