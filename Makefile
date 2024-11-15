@@ -7,6 +7,7 @@ PROTO_FILE := /Users/bernardbaker/Projects/qiba.core/$(PROTO_DIR)/api.proto
 GRPC_OUT_DIR := .
 SRC_DIR := .
 
+COPY_PROTO_TO_DIR := /Users/bernardbaker/Projects/qiba/$(PROTO_DIR)
 AWS_STACK_NAME := qiba-app-stack
 CLOUDFORMATION_TEMPLATE := cloudformation.yml
 
@@ -100,16 +101,25 @@ proto: check-protoc
 		echo "protoc not found, falling back to direct protoc call"; \
 		go generate ./...; \
 	fi
-# protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative chat.proto 
-# $(PROTOC) --proto_path=/Users/bernardbaker/go/src/hexagonal.streamlit.chat/proto/chat.proto --go_out=plugins=grpc:$(GRPC_OUT_DIR) $(PROTO_FILE); \
-# proto:
-#  @echo "Generating gRPC code from $(PROTO_FILE)"
-# $(PROTOC) --go_out=plugins=grpc:$(GRPC_OUT_DIR) $(PROTO_FILE)
-# go generate ./...
+
+.PHONY: copy-proto
+copy-proto: proto
+	@echo "Copying proto artifacts to web app project directory"
+	@if [ -z "$(COPY_PROTO_TO_DIR)" ]; then \
+		echo "Error: COPY_PROTO_TO_DIR is not set"; \
+		exit 1; \
+	fi
+	@if [ ! -d "$(COPY_PROTO_TO_DIR)" ]; then \
+		echo "Creating directory $(COPY_PROTO_TO_DIR)"; \
+		mkdir -p $(COPY_PROTO_TO_DIR); \
+	fi
+	@echo "Copying proto files to $(COPY_PROTO_TO_DIR)"
+	@cp -rf ./proto/* $(COPY_PROTO_TO_DIR)/
+
 
 # Build the Go application
 .PHONY: build
-build: init proto
+build: init proto check-and-copy-proto
 	@echo "Building $(BINARY)"
 	$(GO) build -o $(BINARY) $(SRC_DIR)
 
