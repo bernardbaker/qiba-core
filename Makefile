@@ -7,7 +7,7 @@ PROTO_FILE := /Users/bernardbaker/Projects/qiba.core/$(PROTO_DIR)/api.proto
 GRPC_OUT_DIR := .
 SRC_DIR := .
 
-COPY_PROTO_TO_DIR := /Users/bernardbaker/Projects/qiba/$(PROTO_DIR)
+COPY_PROTO_TO_DIR := /Users/bernardbaker/Projects/qiba
 AWS_STACK_NAME := qiba-app-stack
 CLOUDFORMATION_TEMPLATE := cloudformation.yml
 
@@ -114,12 +114,12 @@ copy-proto: proto
 		mkdir -p $(COPY_PROTO_TO_DIR); \
 	fi
 	@echo "Copying proto files to $(COPY_PROTO_TO_DIR)"
-	@cp -rf ./proto/* $(COPY_PROTO_TO_DIR)/
+	@cp -rf ./proto/api.proto $(COPY_PROTO_TO_DIR)/
 
 
 # Build the Go application
 .PHONY: build
-build: init proto check-and-copy-proto
+build: init proto copy-proto
 	@echo "Building $(BINARY)"
 	$(GO) build -o $(BINARY) $(SRC_DIR)
 
