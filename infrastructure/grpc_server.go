@@ -22,7 +22,15 @@ func NewGameServer(service *app.GameService) *GameServer {
 
 func (s *GameServer) StartGame(ctx context.Context, req *proto.StartGameRequest) (*proto.StartGameResponse, error) {
 	id := strconv.FormatInt(req.User.UserId, 10)
-	encryptedData, hmac, gameID, err := s.service.StartGame(id)
+	user := domain.User{
+		UserId:       req.User.UserId,
+		Username:     req.User.Username,
+		FirstName:    req.User.FirstName,
+		LastName:     req.User.LastName,
+		LanguageCode: req.User.LanguageCode,
+		IsBot:        req.User.IsBot,
+	}
+	encryptedData, hmac, gameID, err := s.service.StartGame(id, user)
 	if err != nil {
 		return nil, err
 	}
@@ -71,18 +79,33 @@ func (s *GameServer) CanPlay(ctx context.Context, req *proto.CanPlayGameRequest)
 
 type ReferralServer struct {
 	proto.UnimplementedReferralServiceServer
-	service *app.ReferralService
+	service     *app.ReferralService
+	gameService *app.GameService
 }
 
-func NewReferralServer(service *app.ReferralService) *ReferralServer {
-	return &ReferralServer{service: service}
+func NewReferralServer(service *app.ReferralService, gameService *app.GameService) *ReferralServer {
+	return &ReferralServer{service: service, gameService: gameService}
 }
 
 func (s *ReferralServer) Referral(ctx context.Context, req *proto.ReferralRequest) (*proto.ReferralResponse, error) {
 	fmt.Println("req.User", req.User)
-	err := s.service.Create(req.User.UserId)
-	if err != nil {
-		return nil, err
+	// Create a new user
+	user := domain.User{
+		UserId:       req.User.UserId,
+		Username:     req.User.Username,
+		FirstName:    req.User.FirstName,
+		LastName:     req.User.LastName,
+		LanguageCode: req.User.LanguageCode,
+		IsBot:        req.User.IsBot,
+	}
+	_, addErr := s.gameService.AddUser(user)
+	if addErr != nil {
+		return nil, addErr
+	}
+	// Add the user to the service
+	createErr := s.service.Create(req.User.UserId)
+	if createErr != nil {
+		return nil, createErr
 	}
 	// debugging
 	fmt.Println(s.service.Get(strconv.FormatInt(req.User.UserId, 10)))
@@ -91,6 +114,9 @@ func (s *ReferralServer) Referral(ctx context.Context, req *proto.ReferralReques
 }
 
 func (s *ReferralServer) AcceptReferral(ctx context.Context, req *proto.AcceptReferralRequest) (*proto.AcceptReferralResponse, error) {
+	// debugging
+	fmt.Println("AcceptReferral")
+	fmt.Println(s.service.Get(strconv.FormatInt(req.From.UserId, 10)))
 	from := domain.User{
 		UserId:       req.From.UserId,
 		Username:     req.From.Username,
@@ -107,13 +133,11 @@ func (s *ReferralServer) AcceptReferral(ctx context.Context, req *proto.AcceptRe
 		LanguageCode: req.To.LanguageCode,
 		IsBot:        req.To.IsBot,
 	}
-	err := s.service.Update(from, to)
-	// debugging
-	fmt.Println(s.service.Get(strconv.FormatInt(req.From.UserId, 10)))
+	success, err := s.service.Update(from, to, *s.gameService)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.AcceptReferralResponse{Success: true}, nil
+	return &proto.AcceptReferralResponse{Success: success}, nil
 }
 
 func (s *ReferralServer) ReferralStatistics(ctx context.Context, req *proto.ReferralStatisticsRequest) (*proto.ReferralStatisticsResponse, error) {

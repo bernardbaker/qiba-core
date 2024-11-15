@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -11,20 +12,26 @@ import (
 
 type GameService struct {
 	repo      ports.GameRepository
+	userRepo  ports.UserRepository
 	encrypter ports.Encrypter
 }
 
-func NewGameService(repo ports.GameRepository, encrypter ports.Encrypter) *GameService {
-	return &GameService{repo: repo, encrypter: encrypter}
+func NewGameService(repo ports.GameRepository, userRepo ports.UserRepository, encrypter ports.Encrypter) *GameService {
+	return &GameService{repo: repo, userRepo: userRepo, encrypter: encrypter}
 }
 
-func (s *GameService) StartGame(userId string) (string, string, string, error) {
+func (s *GameService) StartGame(userId string, user domain.User) (string, string, string, error) {
 	game := domain.NewGame(userId)
 	err := s.repo.SaveGame(game)
 	if err != nil {
 		return "", "", "", err
 	}
-
+	possibleNewUser := domain.NewUser(user)
+	saveErr := s.userRepo.Save(possibleNewUser)
+	if saveErr != nil {
+		fmt.Println("Error saving user: ", saveErr)
+		return "", "", "", saveErr
+	}
 	// Encrypt game data and generate HMAC
 	encryptedData, hmac, err := s.encrypter.EncryptGameData(game.ObjectSeq)
 	if err != nil {
@@ -91,10 +98,70 @@ func (s *GameService) CanPlay(user domain.User, timestamp time.Time) bool {
 	if err != nil {
 		return false
 	}
-	// check if the last game was played more than 24 hours ago
-	// if so, return true
 	if len(games) == 0 {
 		return true
 	}
-	return timestamp.After(games[len(games)-1].EndTime.Add(30 * time.Second))
+	// check if the last game was played more than 24 hours ago
+	latestGame := timestamp.After(games[len(games)-1].EndTime.Add(30 * time.Second))
+
+	if !latestGame {
+
+		// debugging
+		fmt.Println("")
+		getUser, err := s.userRepo.Get(strconv.FormatInt(user.UserId, 10))
+		if err != nil {
+			fmt.Println("CanPlay", "err = s.userRepo.Get(strconv.FormatInt(user.UserId, 10))", err)
+			fmt.Println(err)
+		}
+
+		fmt.Println("CanPlay", "!latestGame", latestGame)
+		if getUser.BonusGames > 0 {
+			fmt.Println("CanPlay", "getUser..BonusGames > 0", getUser.BonusGames)
+
+			getUser.BonusGames--
+			fmt.Println("CanPlay", "getUser..BonusGames is now", getUser.BonusGames)
+			err = s.userRepo.Save(getUser)
+			if err != nil {
+				fmt.Println("CanPlay", "err = s.userRepo.Save(getUser)", err)
+				fmt.Println(err)
+			}
+
+			latestGame = true
+			fmt.Println("CanPlay", "latestGame = true", latestGame)
+		}
+	}
+	fmt.Println("CanPlay", "return latestGame", latestGame)
+	fmt.Println("")
+	return latestGame
+}
+
+func (s *GameService) AddBonusGame(user domain.User) (bool, error) {
+	// convert user.UserId to a string
+	userId := strconv.FormatInt(user.UserId, 10)
+	// debugging
+	fmt.Println("AddBonusGame userId", userId)
+	u, err := s.userRepo.Get(userId)
+	if err != nil {
+		fmt.Println("AddBonusGame err := s.userRepo.Get(userId)", err)
+		return false, err
+	}
+	fmt.Println("AddBonusGame u", u)
+	u.BonusGames++
+	fmt.Println("AddBonusGame u.BonusGames", u.BonusGames)
+	saveErr := s.userRepo.Update(u)
+	if saveErr != nil {
+		fmt.Println("AddBonusGame saveErr := s.userRepo.Save(u)", saveErr)
+		return false, saveErr
+	}
+	return true, nil
+}
+
+func (s *GameService) AddUser(user domain.User) (bool, error) {
+	possibleNewUser := domain.NewUser(user)
+	err := s.userRepo.Save(possibleNewUser)
+	if err != nil {
+		fmt.Println("Error saving possible new user: ", err)
+		return false, err
+	}
+	return true, nil
 }

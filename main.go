@@ -13,9 +13,10 @@ import (
 
 func main() {
 	// Initialize repository, encrypter, and game service
-	repo := infrastructure.NewInMemoryGameRepository() // Our in-memory game repository
+	repo := infrastructure.NewInMemoryGameRepository()     // Our in-memory game repository
+	userRepo := infrastructure.NewInMemoryUserRepository() // Our in-memory game repository
 	encrypter := infrastructure.NewEncrypter([]byte("mysecretencryptionkey1234567890a"))
-	service := app.NewGameService(repo, encrypter)
+	service := app.NewGameService(repo, userRepo, encrypter)
 
 	// Initialize the referral repository and referral service
 	referralRepo := infrastructure.NewInMemoryReferralRepository()
@@ -26,7 +27,7 @@ func main() {
 	// Register game service
 	proto.RegisterGameServiceServer(server, infrastructure.NewGameServer(service))
 	// Register referral service
-	proto.RegisterReferralServiceServer(server, infrastructure.NewReferralServer(referralService))
+	proto.RegisterReferralServiceServer(server, infrastructure.NewReferralServer(referralService, service))
 
 	listener, err := net.Listen("tcp", ":50051")
 	if err != nil {

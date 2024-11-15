@@ -30,7 +30,6 @@ func NewGame(userId string) *Game {
 		StartTime: time.Now(),
 		UserID:    userId,
 	}
-	// game.generateObjectSequence()
 	return game
 }
 
