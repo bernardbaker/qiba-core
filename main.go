@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net"
+	"os"
 
 	"github.com/bernardbaker/qiba.core/app"
 	"github.com/bernardbaker/qiba.core/infrastructure"
@@ -29,11 +30,17 @@ func main() {
 	// Register referral service
 	proto.RegisterReferralServiceServer(server, infrastructure.NewReferralServer(referralService, service))
 
-	listener, err := net.Listen("tcp", ":50051")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "50051"
+		log.Printf("defaulting to port %s", port)
+	}
+
+	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	log.Printf("Starting gRPC server on port 50051...")
+	log.Printf("Starting gRPC server on port %s", port)
 	if err := server.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
