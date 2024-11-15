@@ -146,5 +146,17 @@ func (s *ReferralServer) ReferralStatistics(ctx context.Context, req *proto.Refe
 		return nil, err
 	}
 	count := int64(len(objects.Referrals))
-	return &proto.ReferralStatisticsResponse{Success: true, Count: count}, nil
+	user := domain.User{
+		UserId:       req.User.UserId,
+		Username:     req.User.Username,
+		FirstName:    req.User.FirstName,
+		LastName:     req.User.LastName,
+		LanguageCode: req.User.LanguageCode,
+		IsBot:        req.User.IsBot,
+	}
+	bCount, err := s.gameService.GetBonusGames(user)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.ReferralStatisticsResponse{Success: true, Count: count, BonusCount: bCount}, nil
 }
