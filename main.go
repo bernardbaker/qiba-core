@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"log"
 	"net"
 	"os"
@@ -10,6 +11,9 @@ import (
 	"github.com/bernardbaker/qiba.core/proto"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/grpclog"
+
+	"google.golang.org/grpc/credentials"
 )
 
 func main() {
@@ -23,8 +27,24 @@ func main() {
 	referralRepo := infrastructure.NewInMemoryReferralRepository()
 	referralService := app.NewReferralService(referralRepo)
 
+	var serverOpts []grpc.ServerOption
+
+	// Check if we're in development mode
+	if os.Getenv("ENV") == "development" {
+		// Add your production TLS configuration here
+		// Example: Load certificates from files or secrets management
+		// creds := credentials.NewTLS(&tls.Config{...})
+		// serverOpts = append(serverOpts, grpc.Creds(creds))
+	} else {
+		// TLS with InsecureSkipVerify for local development only
+		creds := credentials.NewTLS(&tls.Config{
+			InsecureSkipVerify: true,
+		})
+		serverOpts = append(serverOpts, grpc.Creds(creds))
+	}
+
 	// Setup and start gRPC server
-	server := grpc.NewServer()
+	server := grpc.NewServer(serverOpts...)
 	// Register game service
 	proto.RegisterGameServiceServer(server, infrastructure.NewGameServer(service))
 	// Register referral service
@@ -36,10 +56,17 @@ func main() {
 		log.Printf("defaulting to port %s", port)
 	}
 
-	listener, err := net.Listen("tcp", ":"+port)
+	// Setting new Logger
+	grpcLog := grpclog.NewLoggerV2(os.Stdout, os.Stderr, os.Stderr)
+	grpclog.SetLoggerV2(grpcLog)
+
+	listener, err := net.Listen("tcp", "0.0.0.0:"+port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
+	log.Printf("Server listening at %v", listener.Addr())
+
 	log.Printf("Starting gRPC server on port %s", port)
 	if err := server.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)

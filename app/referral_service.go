@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -19,8 +20,8 @@ func NewReferralService(repo ports.ReferralRepository) *ReferralService {
 func (s *ReferralService) Create(user int64) error {
 	owner := strconv.FormatInt(user, 10)
 	fmt.Println("owner", owner)
-	_, err := s.repo.Get(owner)
-	if err != nil {
+	u := s.repo.Get(owner)
+	if u == nil {
 		saveErr := s.repo.Save(domain.NewReferral(owner))
 		if saveErr != nil {
 			return saveErr
@@ -37,19 +38,21 @@ func (s *ReferralService) Save(object *domain.Referral) error {
 	return nil
 }
 
-func (s *ReferralService) Get(objectID string) (*domain.Referral, error) {
-	obj, err := s.repo.Get(objectID)
-	if err != nil {
-		return nil, err
+func (s *ReferralService) Get(objectID string) (*domain.Referral, bool) {
+	obj := s.repo.Get(objectID)
+	if obj == nil {
+		fmt.Println(errors.New("service get referral not found"))
+		return nil, false
 	}
-	return obj, nil
+	return obj, true
 }
 
-func (s *ReferralService) Update(from domain.User, to domain.User, gameService GameService) (bool, error) {
+func (s *ReferralService) Update(from domain.User, to domain.User, gameService GameService) (bool, bool) {
 	owner := strconv.FormatInt(from.UserId, 10)
-	obj, err := s.repo.Get(owner)
-	if err != nil {
-		return false, err
+	obj := s.repo.Get(owner)
+	if obj == nil {
+		fmt.Println(errors.New("service update referral not found"))
+		return false, false
 	}
 	// check the referrals
 	hasReferral := false
@@ -66,8 +69,9 @@ func (s *ReferralService) Update(from domain.User, to domain.User, gameService G
 		obj.Referrals = append(obj.Referrals, *domain.NewReferralObject(from, to))
 		// store the referral
 		updateError := s.repo.Update(obj)
-		if updateError != nil {
-			return false, updateError
+		if !updateError {
+			fmt.Println(errors.New("service update referral not found"))
+			return false, false
 		}
 
 		fmt.Println("")
@@ -75,8 +79,8 @@ func (s *ReferralService) Update(from domain.User, to domain.User, gameService G
 		success, addBonusErr := gameService.AddBonusGame(from)
 		if addBonusErr != nil {
 			fmt.Println("addBonusErr", addBonusErr)
-			return success, addBonusErr
+			return success, true
 		}
 	}
-	return false, nil
+	return false, false
 }

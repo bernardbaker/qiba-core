@@ -1,0 +1,37 @@
+# The configuration schema is defined by the service.proto file.
+# https://github.com/googleapis/googleapis/blob/master/google/api/service.proto
+
+type: google.api.Service
+config_version: 3
+name: "*.apigateway.qiba-core-441819.cloud.goog"
+title: API Gateway + Cloud Run gRPC
+apis:
+  - name: qiba.GameService
+  - name: qiba.ReferralService
+usage:
+  rules:
+    # ListShelves methods can be called without an API Key.
+    # - selector: endpoints.examples.bookstore.Bookstore.ListShelves
+    - selector: qiba.GameService.StartGame
+      allow_unregistered_calls: true
+    - selector: qiba.GameService.Spawn
+      allow_unregistered_calls: true
+    - selector: qiba.GameService.Tap
+      allow_unregistered_calls: true
+    - selector: qiba.GameService.EndGame
+      allow_unregistered_calls: true
+    - selector: qiba.GameService.CanPlay
+      allow_unregistered_calls: true
+    - selector: qiba.GameService.RedeemBonusGame
+      allow_unregistered_calls: true
+      #
+    - selector: qiba.ReferralService.Referral
+      allow_unregistered_calls: true
+    - selector: qiba.ReferralService.AcceptReferral
+      allow_unregistered_calls: true
+    - selector: qiba.ReferralService.ReferralStatistics
+      allow_unregistered_calls: true
+backend:
+  rules:
+    - selector: "*"
+      address: grpcs://qiba-core-1013606607168.us-central1.run.app

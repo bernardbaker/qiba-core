@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -134,16 +135,17 @@ func (s *ReferralServer) AcceptReferral(ctx context.Context, req *proto.AcceptRe
 		IsBot:        req.To.IsBot,
 	}
 	success, err := s.service.Update(from, to, *s.gameService)
-	if err != nil {
-		return nil, err
+	if !err {
+		return nil, errors.New("gRPC server accept referral update error")
 	}
 	return &proto.AcceptReferralResponse{Success: success}, nil
 }
 
 func (s *ReferralServer) ReferralStatistics(ctx context.Context, req *proto.ReferralStatisticsRequest) (*proto.ReferralStatisticsResponse, error) {
 	objects, err := s.service.Get(strconv.FormatInt(req.User.UserId, 10))
-	if err != nil {
-		return nil, err
+	if !err {
+		fmt.Println(errors.New("gRPC server referral statistics error"))
+		return nil, nil
 	}
 	count := int64(len(objects.Referrals))
 	user := domain.User{
@@ -154,9 +156,10 @@ func (s *ReferralServer) ReferralStatistics(ctx context.Context, req *proto.Refe
 		LanguageCode: req.User.LanguageCode,
 		IsBot:        req.User.IsBot,
 	}
-	bCount, err := s.gameService.GetBonusGames(user)
-	if err != nil {
-		return nil, err
+	bCount, bErr := s.gameService.GetBonusGames(user)
+	if !bErr {
+		fmt.Println(errors.New("gRPC server referral statistics get bonus games error"))
+		return nil, nil
 	}
 	return &proto.ReferralStatisticsResponse{Success: true, Count: count, BonusCount: bCount}, nil
 }

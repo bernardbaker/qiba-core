@@ -166,7 +166,7 @@ func (s *GameService) AddUser(user domain.User) (bool, error) {
 	return true, nil
 }
 
-func (s *GameService) GetBonusGames(user domain.User) (string, error) {
+func (s *GameService) GetBonusGames(user domain.User) (string, bool) {
 	// convert user.UserId to a string
 	userId := strconv.FormatInt(user.UserId, 10)
 	// debugging
@@ -174,8 +174,9 @@ func (s *GameService) GetBonusGames(user domain.User) (string, error) {
 	u, err := s.userRepo.Get(userId)
 	if err != nil {
 		fmt.Println("GetBonusGames u, err := s.userRepo.Get(userId)", err)
-		return string(0), err
+		return string(0), false
 	}
 	count := strconv.FormatInt(u.BonusGames, 10)
-	return count, nil
+	fmt.Println("count", count)
+	return count, true
 }

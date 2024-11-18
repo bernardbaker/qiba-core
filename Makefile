@@ -22,6 +22,9 @@ UNAME_M := $(shell uname -m)
 PROTOC_VERSION := 25.1
 PROTOC_ZIP := protoc-$(PROTOC_VERSION)-linux-x86_64.zip
 
+# Development environment
+ENV := development
+
 ifeq ($(UNAME_S),Darwin)
     ifeq ($(UNAME_M),arm64)
         PROTOC_ZIP := protoc-$(PROTOC_VERSION)-osx-aarch_64.zip
@@ -127,7 +130,7 @@ build: init proto copy-proto
 .PHONY: run
 run: build
 	@echo "Running $(BINARY)..."
-	./$(BINARY)
+	ENV=$(ENV) ./$(BINARY)
 
 # Test the Go application
 .PHONY: test

@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/bernardbaker/qiba.core/domain"
@@ -27,24 +28,26 @@ func (repo *InMemoryReferralRepository) Save(obj *domain.Referral) error {
 }
 
 // Get retrieves a referral by its ID
-func (repo *InMemoryReferralRepository) Get(objId string) (*domain.Referral, error) {
+func (repo *InMemoryReferralRepository) Get(objId string) *domain.Referral {
 	repo.mutex.RLock()
 	defer repo.mutex.RUnlock()
 	obj, exists := repo.store[objId]
 	if !exists {
-		return nil, errors.New("referral not found")
+		fmt.Println(errors.New("referral not found"))
+		return nil
 	}
-	return obj, nil
+	return obj
 }
 
 // Update updates an existing referral in the in-memory map
-func (repo *InMemoryReferralRepository) Update(obj *domain.Referral) error {
+func (repo *InMemoryReferralRepository) Update(obj *domain.Referral) bool {
 	repo.mutex.Lock()
 	defer repo.mutex.Unlock()
 	_, exists := repo.store[obj.ID]
 	if !exists {
-		return errors.New("referral not found")
+		fmt.Println(errors.New("referral not found"))
+		return false
 	}
 	repo.store[obj.ID] = obj
-	return nil
+	return true
 }
