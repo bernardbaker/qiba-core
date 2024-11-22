@@ -647,12 +647,16 @@ var TelegramMiniApp_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	GameService_StartGame_FullMethodName       = "/qiba.GameService/StartGame"
-	GameService_Spawn_FullMethodName           = "/qiba.GameService/Spawn"
-	GameService_Tap_FullMethodName             = "/qiba.GameService/Tap"
-	GameService_EndGame_FullMethodName         = "/qiba.GameService/EndGame"
-	GameService_CanPlay_FullMethodName         = "/qiba.GameService/CanPlay"
-	GameService_RedeemBonusGame_FullMethodName = "/qiba.GameService/RedeemBonusGame"
+	GameService_StartGame_FullMethodName   = "/qiba.GameService/StartGame"
+	GameService_Spawn_FullMethodName       = "/qiba.GameService/Spawn"
+	GameService_Tap_FullMethodName         = "/qiba.GameService/Tap"
+	GameService_EndGame_FullMethodName     = "/qiba.GameService/EndGame"
+	GameService_CanPlay_FullMethodName     = "/qiba.GameService/CanPlay"
+	GameService_Leaderboard_FullMethodName = "/qiba.GameService/Leaderboard"
+	GameService_GameTime_FullMethodName    = "/qiba.GameService/GameTime"
+	GameService_MaxPlays_FullMethodName    = "/qiba.GameService/MaxPlays"
+	GameService_PlayCount_FullMethodName   = "/qiba.GameService/PlayCount"
+	GameService_PlaysLeft_FullMethodName   = "/qiba.GameService/PlaysLeft"
 )
 
 // GameServiceClient is the client API for GameService service.
@@ -664,7 +668,11 @@ type GameServiceClient interface {
 	Tap(ctx context.Context, in *TapRequest, opts ...grpc.CallOption) (*TapResponse, error)
 	EndGame(ctx context.Context, in *EndGameRequest, opts ...grpc.CallOption) (*EndGameResponse, error)
 	CanPlay(ctx context.Context, in *CanPlayGameRequest, opts ...grpc.CallOption) (*CanPlayGameResponse, error)
-	RedeemBonusGame(ctx context.Context, in *RedeemBonusGameRequest, opts ...grpc.CallOption) (*RedeemBonusGameResponse, error)
+	Leaderboard(ctx context.Context, in *LeaderboardRequest, opts ...grpc.CallOption) (*LeaderboardResponse, error)
+	GameTime(ctx context.Context, in *GameTimeRequest, opts ...grpc.CallOption) (*GameTimeResponse, error)
+	MaxPlays(ctx context.Context, in *MaxPlaysRequest, opts ...grpc.CallOption) (*MaxPlaysResponse, error)
+	PlayCount(ctx context.Context, in *PlayCountRequest, opts ...grpc.CallOption) (*PlayCountResponse, error)
+	PlaysLeft(ctx context.Context, in *PlaysLeftRequest, opts ...grpc.CallOption) (*PlaysLeftResponse, error)
 }
 
 type gameServiceClient struct {
@@ -725,10 +733,50 @@ func (c *gameServiceClient) CanPlay(ctx context.Context, in *CanPlayGameRequest,
 	return out, nil
 }
 
-func (c *gameServiceClient) RedeemBonusGame(ctx context.Context, in *RedeemBonusGameRequest, opts ...grpc.CallOption) (*RedeemBonusGameResponse, error) {
+func (c *gameServiceClient) Leaderboard(ctx context.Context, in *LeaderboardRequest, opts ...grpc.CallOption) (*LeaderboardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RedeemBonusGameResponse)
-	err := c.cc.Invoke(ctx, GameService_RedeemBonusGame_FullMethodName, in, out, cOpts...)
+	out := new(LeaderboardResponse)
+	err := c.cc.Invoke(ctx, GameService_Leaderboard_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameServiceClient) GameTime(ctx context.Context, in *GameTimeRequest, opts ...grpc.CallOption) (*GameTimeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GameTimeResponse)
+	err := c.cc.Invoke(ctx, GameService_GameTime_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameServiceClient) MaxPlays(ctx context.Context, in *MaxPlaysRequest, opts ...grpc.CallOption) (*MaxPlaysResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MaxPlaysResponse)
+	err := c.cc.Invoke(ctx, GameService_MaxPlays_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameServiceClient) PlayCount(ctx context.Context, in *PlayCountRequest, opts ...grpc.CallOption) (*PlayCountResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PlayCountResponse)
+	err := c.cc.Invoke(ctx, GameService_PlayCount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameServiceClient) PlaysLeft(ctx context.Context, in *PlaysLeftRequest, opts ...grpc.CallOption) (*PlaysLeftResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PlaysLeftResponse)
+	err := c.cc.Invoke(ctx, GameService_PlaysLeft_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -744,7 +792,11 @@ type GameServiceServer interface {
 	Tap(context.Context, *TapRequest) (*TapResponse, error)
 	EndGame(context.Context, *EndGameRequest) (*EndGameResponse, error)
 	CanPlay(context.Context, *CanPlayGameRequest) (*CanPlayGameResponse, error)
-	RedeemBonusGame(context.Context, *RedeemBonusGameRequest) (*RedeemBonusGameResponse, error)
+	Leaderboard(context.Context, *LeaderboardRequest) (*LeaderboardResponse, error)
+	GameTime(context.Context, *GameTimeRequest) (*GameTimeResponse, error)
+	MaxPlays(context.Context, *MaxPlaysRequest) (*MaxPlaysResponse, error)
+	PlayCount(context.Context, *PlayCountRequest) (*PlayCountResponse, error)
+	PlaysLeft(context.Context, *PlaysLeftRequest) (*PlaysLeftResponse, error)
 	mustEmbedUnimplementedGameServiceServer()
 }
 
@@ -770,8 +822,20 @@ func (UnimplementedGameServiceServer) EndGame(context.Context, *EndGameRequest) 
 func (UnimplementedGameServiceServer) CanPlay(context.Context, *CanPlayGameRequest) (*CanPlayGameResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CanPlay not implemented")
 }
-func (UnimplementedGameServiceServer) RedeemBonusGame(context.Context, *RedeemBonusGameRequest) (*RedeemBonusGameResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RedeemBonusGame not implemented")
+func (UnimplementedGameServiceServer) Leaderboard(context.Context, *LeaderboardRequest) (*LeaderboardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Leaderboard not implemented")
+}
+func (UnimplementedGameServiceServer) GameTime(context.Context, *GameTimeRequest) (*GameTimeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GameTime not implemented")
+}
+func (UnimplementedGameServiceServer) MaxPlays(context.Context, *MaxPlaysRequest) (*MaxPlaysResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MaxPlays not implemented")
+}
+func (UnimplementedGameServiceServer) PlayCount(context.Context, *PlayCountRequest) (*PlayCountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PlayCount not implemented")
+}
+func (UnimplementedGameServiceServer) PlaysLeft(context.Context, *PlaysLeftRequest) (*PlaysLeftResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PlaysLeft not implemented")
 }
 func (UnimplementedGameServiceServer) mustEmbedUnimplementedGameServiceServer() {}
 func (UnimplementedGameServiceServer) testEmbeddedByValue()                     {}
@@ -884,20 +948,92 @@ func _GameService_CanPlay_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GameService_RedeemBonusGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RedeemBonusGameRequest)
+func _GameService_Leaderboard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LeaderboardRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GameServiceServer).RedeemBonusGame(ctx, in)
+		return srv.(GameServiceServer).Leaderboard(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GameService_RedeemBonusGame_FullMethodName,
+		FullMethod: GameService_Leaderboard_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServiceServer).RedeemBonusGame(ctx, req.(*RedeemBonusGameRequest))
+		return srv.(GameServiceServer).Leaderboard(ctx, req.(*LeaderboardRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameService_GameTime_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GameTimeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServiceServer).GameTime(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameService_GameTime_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServiceServer).GameTime(ctx, req.(*GameTimeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameService_MaxPlays_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MaxPlaysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServiceServer).MaxPlays(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameService_MaxPlays_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServiceServer).MaxPlays(ctx, req.(*MaxPlaysRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameService_PlayCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlayCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServiceServer).PlayCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameService_PlayCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServiceServer).PlayCount(ctx, req.(*PlayCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameService_PlaysLeft_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlaysLeftRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServiceServer).PlaysLeft(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameService_PlaysLeft_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServiceServer).PlaysLeft(ctx, req.(*PlaysLeftRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -930,8 +1066,24 @@ var GameService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GameService_CanPlay_Handler,
 		},
 		{
-			MethodName: "RedeemBonusGame",
-			Handler:    _GameService_RedeemBonusGame_Handler,
+			MethodName: "Leaderboard",
+			Handler:    _GameService_Leaderboard_Handler,
+		},
+		{
+			MethodName: "GameTime",
+			Handler:    _GameService_GameTime_Handler,
+		},
+		{
+			MethodName: "MaxPlays",
+			Handler:    _GameService_MaxPlays_Handler,
+		},
+		{
+			MethodName: "PlayCount",
+			Handler:    _GameService_PlayCount_Handler,
+		},
+		{
+			MethodName: "PlaysLeft",
+			Handler:    _GameService_PlaysLeft_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -11,21 +11,24 @@ import (
 	"github.com/bernardbaker/qiba.core/proto"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/grpclog"
 
-	"google.golang.org/grpc/credentials"
+	_ "google.golang.org/grpc/encoding/gzip"
 )
 
 func main() {
 	// Initialize repository, encrypter, and game service
-	repo := infrastructure.NewInMemoryGameRepository()     // Our in-memory game repository
-	userRepo := infrastructure.NewInMemoryUserRepository() // Our in-memory game repository
+	repo := infrastructure.NewInMemoryGameRepository()                   // Our in-memory game repository
+	userRepo := infrastructure.NewInMemoryUserRepository()               // Our in-memory game repository
+	leaderboardRepo := infrastructure.NewInMemoryLeaderboardRepository() // Our in-memory game repository
 	encrypter := infrastructure.NewEncrypter([]byte("mysecretencryptionkey1234567890a"))
-	service := app.NewGameService(repo, userRepo, encrypter)
-
+	service := app.NewGameService(repo, userRepo, leaderboardRepo, encrypter)
 	// Initialize the referral repository and referral service
 	referralRepo := infrastructure.NewInMemoryReferralRepository()
 	referralService := app.NewReferralService(referralRepo)
+	// Initialize the leader board
+	service.CreateLeaderboard("qiba")
 
 	var serverOpts []grpc.ServerOption
 
@@ -38,9 +41,14 @@ func main() {
 	} else {
 		// TLS with InsecureSkipVerify for local development only
 		creds := credentials.NewTLS(&tls.Config{
-			InsecureSkipVerify: true,
+			InsecureSkipVerify: false,
 		})
-		serverOpts = append(serverOpts, grpc.Creds(creds))
+		serverOpts = append(
+			serverOpts,
+			grpc.Creds(creds),
+			grpc.MaxRecvMsgSize(2000*1024*1024),
+			grpc.MaxSendMsgSize(2000*1024*1024),
+		)
 	}
 
 	// Setup and start gRPC server

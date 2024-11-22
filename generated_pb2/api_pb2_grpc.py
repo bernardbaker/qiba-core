@@ -707,10 +707,30 @@ class GameServiceStub(object):
                 request_serializer=api__pb2.CanPlayGameRequest.SerializeToString,
                 response_deserializer=api__pb2.CanPlayGameResponse.FromString,
                 _registered_method=True)
-        self.RedeemBonusGame = channel.unary_unary(
-                '/qiba.GameService/RedeemBonusGame',
-                request_serializer=api__pb2.RedeemBonusGameRequest.SerializeToString,
-                response_deserializer=api__pb2.RedeemBonusGameResponse.FromString,
+        self.Leaderboard = channel.unary_unary(
+                '/qiba.GameService/Leaderboard',
+                request_serializer=api__pb2.LeaderboardRequest.SerializeToString,
+                response_deserializer=api__pb2.LeaderboardResponse.FromString,
+                _registered_method=True)
+        self.GameTime = channel.unary_unary(
+                '/qiba.GameService/GameTime',
+                request_serializer=api__pb2.GameTimeRequest.SerializeToString,
+                response_deserializer=api__pb2.GameTimeResponse.FromString,
+                _registered_method=True)
+        self.MaxPlays = channel.unary_unary(
+                '/qiba.GameService/MaxPlays',
+                request_serializer=api__pb2.MaxPlaysRequest.SerializeToString,
+                response_deserializer=api__pb2.MaxPlaysResponse.FromString,
+                _registered_method=True)
+        self.PlayCount = channel.unary_unary(
+                '/qiba.GameService/PlayCount',
+                request_serializer=api__pb2.PlayCountRequest.SerializeToString,
+                response_deserializer=api__pb2.PlayCountResponse.FromString,
+                _registered_method=True)
+        self.PlaysLeft = channel.unary_unary(
+                '/qiba.GameService/PlaysLeft',
+                request_serializer=api__pb2.PlaysLeftRequest.SerializeToString,
+                response_deserializer=api__pb2.PlaysLeftResponse.FromString,
                 _registered_method=True)
 
 
@@ -747,7 +767,31 @@ class GameServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def RedeemBonusGame(self, request, context):
+    def Leaderboard(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GameTime(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def MaxPlays(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def PlayCount(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def PlaysLeft(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -781,10 +825,30 @@ def add_GameServiceServicer_to_server(servicer, server):
                     request_deserializer=api__pb2.CanPlayGameRequest.FromString,
                     response_serializer=api__pb2.CanPlayGameResponse.SerializeToString,
             ),
-            'RedeemBonusGame': grpc.unary_unary_rpc_method_handler(
-                    servicer.RedeemBonusGame,
-                    request_deserializer=api__pb2.RedeemBonusGameRequest.FromString,
-                    response_serializer=api__pb2.RedeemBonusGameResponse.SerializeToString,
+            'Leaderboard': grpc.unary_unary_rpc_method_handler(
+                    servicer.Leaderboard,
+                    request_deserializer=api__pb2.LeaderboardRequest.FromString,
+                    response_serializer=api__pb2.LeaderboardResponse.SerializeToString,
+            ),
+            'GameTime': grpc.unary_unary_rpc_method_handler(
+                    servicer.GameTime,
+                    request_deserializer=api__pb2.GameTimeRequest.FromString,
+                    response_serializer=api__pb2.GameTimeResponse.SerializeToString,
+            ),
+            'MaxPlays': grpc.unary_unary_rpc_method_handler(
+                    servicer.MaxPlays,
+                    request_deserializer=api__pb2.MaxPlaysRequest.FromString,
+                    response_serializer=api__pb2.MaxPlaysResponse.SerializeToString,
+            ),
+            'PlayCount': grpc.unary_unary_rpc_method_handler(
+                    servicer.PlayCount,
+                    request_deserializer=api__pb2.PlayCountRequest.FromString,
+                    response_serializer=api__pb2.PlayCountResponse.SerializeToString,
+            ),
+            'PlaysLeft': grpc.unary_unary_rpc_method_handler(
+                    servicer.PlaysLeft,
+                    request_deserializer=api__pb2.PlaysLeftRequest.FromString,
+                    response_serializer=api__pb2.PlaysLeftResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -933,7 +997,7 @@ class GameService(object):
             _registered_method=True)
 
     @staticmethod
-    def RedeemBonusGame(request,
+    def Leaderboard(request,
             target,
             options=(),
             channel_credentials=None,
@@ -946,9 +1010,117 @@ class GameService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/qiba.GameService/RedeemBonusGame',
-            api__pb2.RedeemBonusGameRequest.SerializeToString,
-            api__pb2.RedeemBonusGameResponse.FromString,
+            '/qiba.GameService/Leaderboard',
+            api__pb2.LeaderboardRequest.SerializeToString,
+            api__pb2.LeaderboardResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GameTime(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/qiba.GameService/GameTime',
+            api__pb2.GameTimeRequest.SerializeToString,
+            api__pb2.GameTimeResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def MaxPlays(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/qiba.GameService/MaxPlays',
+            api__pb2.MaxPlaysRequest.SerializeToString,
+            api__pb2.MaxPlaysResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def PlayCount(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/qiba.GameService/PlayCount',
+            api__pb2.PlayCountRequest.SerializeToString,
+            api__pb2.PlayCountResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def PlaysLeft(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/qiba.GameService/PlaysLeft',
+            api__pb2.PlaysLeftRequest.SerializeToString,
+            api__pb2.PlaysLeftResponse.FromString,
             options,
             channel_credentials,
             insecure,

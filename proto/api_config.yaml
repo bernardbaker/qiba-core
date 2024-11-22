@@ -10,8 +10,6 @@ apis:
   - name: qiba.ReferralService
 usage:
   rules:
-    # ListShelves methods can be called without an API Key.
-    # - selector: endpoints.examples.bookstore.Bookstore.ListShelves
     - selector: qiba.GameService.StartGame
       allow_unregistered_calls: true
     - selector: qiba.GameService.Spawn
@@ -22,9 +20,16 @@ usage:
       allow_unregistered_calls: true
     - selector: qiba.GameService.CanPlay
       allow_unregistered_calls: true
-    - selector: qiba.GameService.RedeemBonusGame
+    - selector: qiba.GameService.Leaderboard
       allow_unregistered_calls: true
-      #
+    - selector: qiba.GameService.GameTime
+      allow_unregistered_calls: true
+    - selector: qiba.GameService.MaxPlays
+      allow_unregistered_calls: true
+    - selector: qiba.GameService.PlayCount
+      allow_unregistered_calls: true
+    - selector: qiba.GameService.PlaysLeft
+      allow_unregistered_calls: true
     - selector: qiba.ReferralService.Referral
       allow_unregistered_calls: true
     - selector: qiba.ReferralService.AcceptReferral

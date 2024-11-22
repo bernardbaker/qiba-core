@@ -50,6 +50,7 @@ func (s *GameServer) Tap(ctx context.Context, req *proto.TapRequest) (*proto.Tap
 	timestamp, _ := time.Parse(time.RFC3339, req.Timestamp)
 	success, err := s.service.Tap(req.GameId, req.ObjectId, timestamp)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	return &proto.TapResponse{Success: success}, nil
@@ -60,6 +61,31 @@ func (s *GameServer) EndGame(ctx context.Context, req *proto.EndGameRequest) (*p
 	if err != nil {
 		return nil, err
 	}
+	leaderboard, err := s.service.GetLeaderboard("qiba")
+	fmt.Println("gRPC server EndGame", err)
+	fmt.Println("leaderboards", leaderboard)
+	fmt.Println("req.User", req.User)
+
+	// create a user
+	user := domain.User{
+		UserId:       req.User.UserId,
+		Username:     req.User.Username,
+		FirstName:    req.User.FirstName,
+		LastName:     req.User.LastName,
+		LanguageCode: req.User.LanguageCode,
+		IsBot:        req.User.IsBot,
+	}
+	fmt.Println("EndGame user", user)
+	table, err := s.service.AddToLeaderboard(user, score)
+	if err != nil {
+		return nil, errors.New("failed to add user to leaderboard")
+	}
+	fmt.Println("after leaderboard table", len(table.Entries))
+	saveErr := s.service.SaveLeaderboard(table)
+	if saveErr != nil {
+		return nil, errors.New("failed to save leaderboard")
+	}
+	// TODO Using the returned user update the Table
 	return &proto.EndGameResponse{Score: score}, nil
 }
 
@@ -76,6 +102,74 @@ func (s *GameServer) CanPlay(ctx context.Context, req *proto.CanPlayGameRequest)
 	timestamp := time.UnixMilli(milliseconds).UTC()
 	success := s.service.CanPlay(user, timestamp)
 	return &proto.CanPlayGameResponse{Success: success}, nil
+}
+
+// TODO: finish this off
+func (s *GameServer) Leaderboard(ctx context.Context, req *proto.LeaderboardRequest) (*proto.LeaderboardResponse, error) {
+	fmt.Println("")
+	fmt.Println("Leaderboard")
+
+	// create a user
+	user := domain.User{
+		UserId:       req.User.UserId,
+		Username:     req.User.Username,
+		FirstName:    req.User.FirstName,
+		LastName:     req.User.LastName,
+		LanguageCode: req.User.LanguageCode,
+		IsBot:        req.User.IsBot,
+	}
+	fmt.Println("req.User", user)
+	// Get the domain table
+	jsonString, err := s.service.GetLeaderboard("qiba")
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("gRPC server leaderboard", jsonString)
+	return &proto.LeaderboardResponse{Success: true, Table: jsonString}, nil
+}
+
+func (s *GameServer) GameTime(ctx context.Context, req *proto.GameTimeRequest) (*proto.GameTimeResponse, error) {
+	value := s.service.GameTime()
+	return &proto.GameTimeResponse{Success: true, Time: value}, nil
+}
+
+func (s *GameServer) MaxPlays(ctx context.Context, req *proto.MaxPlaysRequest) (*proto.MaxPlaysResponse, error) {
+	user := domain.User{
+		UserId:       req.User.UserId,
+		Username:     req.User.Username,
+		FirstName:    req.User.FirstName,
+		LastName:     req.User.LastName,
+		LanguageCode: req.User.LanguageCode,
+		IsBot:        req.User.IsBot,
+	}
+	value := s.service.MaxPlays(user)
+	return &proto.MaxPlaysResponse{Success: true, Value: value}, nil
+}
+
+func (s *GameServer) PlayCount(ctx context.Context, req *proto.PlayCountRequest) (*proto.PlayCountResponse, error) {
+	user := domain.User{
+		UserId:       req.User.UserId,
+		Username:     req.User.Username,
+		FirstName:    req.User.FirstName,
+		LastName:     req.User.LastName,
+		LanguageCode: req.User.LanguageCode,
+		IsBot:        req.User.IsBot,
+	}
+	value := s.service.PlayCount(user)
+	return &proto.PlayCountResponse{Success: true, Value: value}, nil
+}
+
+func (s *GameServer) PlaysLeft(ctx context.Context, req *proto.PlaysLeftRequest) (*proto.PlaysLeftResponse, error) {
+	user := domain.User{
+		UserId:       req.User.UserId,
+		Username:     req.User.Username,
+		FirstName:    req.User.FirstName,
+		LastName:     req.User.LastName,
+		LanguageCode: req.User.LanguageCode,
+		IsBot:        req.User.IsBot,
+	}
+	value := s.service.PlaysLeft(user)
+	return &proto.PlaysLeftResponse{Success: true, Value: value}, nil
 }
 
 type ReferralServer struct {

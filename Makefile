@@ -7,7 +7,7 @@ PROTO_FILE := /Users/bernardbaker/Projects/qiba.core/$(PROTO_DIR)/api.proto
 GRPC_OUT_DIR := .
 SRC_DIR := .
 
-COPY_PROTO_TO_DIR := /Users/bernardbaker/Projects/qiba
+COPY_PROTO_TO_DIR := /Users/bernardbaker/Projects/qiba/proto
 AWS_STACK_NAME := qiba-app-stack
 CLOUDFORMATION_TEMPLATE := cloudformation.yml
 

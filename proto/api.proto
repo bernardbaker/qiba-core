@@ -292,6 +292,7 @@ message TapResponse {
 
 message EndGameRequest {
     string game_id = 1;
+    User user = 2;
 }
 
 message EndGameResponse {
@@ -326,16 +327,6 @@ message CanPlayGameResponse {
     bool success = 1;
 }
 
-message RedeemBonusGameRequest {
-    User user = 1;
-    string timestamp = 3;
-}
-
-message RedeemBonusGameResponse {
-    bool success = 1;
-    int64 count = 2;
-}
-
 message ReferralStatisticsRequest {
     User user = 1;
 }
@@ -346,13 +337,69 @@ message ReferralStatisticsResponse {
     string bonus_count = 3;
 }
 
+message LeaderboardRequest {
+    User user = 1;
+}
+
+message LeaderboardResponse {
+    bool success = 1;
+    string table = 2;
+}
+
+message Table {
+    repeated GameEntry entries = 1;
+}
+
+message GameEntry {
+    User user = 1;
+    int32 score = 2;
+    string timestamp = 3;
+}
+
+message GameTimeRequest {}
+message GameTimeResponse {
+    bool success = 1;
+    int32 time = 2;
+}
+
+message MaxPlaysRequest {
+    User user = 1;
+}
+
+message MaxPlaysResponse {
+    bool success = 1;
+    int32 value = 2;
+}
+
+message PlayCountRequest {
+    User user = 1;
+}
+
+message PlayCountResponse {
+    bool success = 1;
+    int32 value = 2;
+}
+
+message PlaysLeftRequest {
+    User user = 1;
+}
+
+message PlaysLeftResponse {
+    bool success = 1;
+    int32 value = 2;
+}
+
 service GameService {
     rpc StartGame (StartGameRequest) returns (StartGameResponse);
     rpc Spawn (SpawnRequest) returns (SpawnResponse);
     rpc Tap (TapRequest) returns (TapResponse);
     rpc EndGame (EndGameRequest) returns (EndGameResponse);
     rpc CanPlay (CanPlayGameRequest) returns (CanPlayGameResponse);
-    rpc RedeemBonusGame (RedeemBonusGameRequest) returns (RedeemBonusGameResponse);
+    rpc Leaderboard (LeaderboardRequest) returns (LeaderboardResponse);
+    rpc GameTime (GameTimeRequest) returns (GameTimeResponse);
+    rpc MaxPlays (MaxPlaysRequest) returns (MaxPlaysResponse);
+    rpc PlayCount (PlayCountRequest) returns (PlayCountResponse);
+    rpc PlaysLeft (PlaysLeftRequest) returns (PlaysLeftResponse);
 }
 
 service ReferralService {
