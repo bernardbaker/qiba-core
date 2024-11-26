@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"cmp"
+	"slices"
 	"time"
 )
 
@@ -36,4 +38,19 @@ func NewLeaderboardObject(user User, score int32) *GameEntry {
 		Timestamp: time.Now(),
 	}
 	return entry
+}
+
+func OrderLeaderboard(table *Table) *Table {
+	// Sort table by Score and Timestamp using slices.SortFunc.
+	// The newest score is further up the leaderboard.
+	compareFunc := func(a, b GameEntry) int {
+		if a.Score != b.Score {
+			return cmp.Compare(b.Score, a.Score)
+		}
+		// If scores are equal, compare timestamps
+		return cmp.Compare(b.Timestamp.UnixMilli(), a.Timestamp.UnixMilli())
+	}
+
+	slices.SortFunc(table.Entries, compareFunc)
+	return table
 }

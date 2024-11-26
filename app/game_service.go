@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/bernardbaker/qiba.core/domain"
+	"github.com/bernardbaker/qiba.core/mocks"
 	"github.com/bernardbaker/qiba.core/ports"
 )
 
@@ -184,9 +185,23 @@ func (s *GameService) GetBonusGames(user domain.User) (string, bool) {
 	return count, true
 }
 
-func (s *GameService) CreateLeaderboard(name string) {
+func (s *GameService) CreateLeaderboard(name string, prepopulate bool) {
 	leaderboard := domain.NewLeaderboard(name)
 	s.leaderboardRepo.SaveLeaderboard(leaderboard)
+
+	if prepopulate {
+		table, err := s.leaderboardRepo.GetLeaderboard("qiba")
+		if err != nil {
+			fmt.Println(err)
+		}
+		for _, entry := range mocks.GenerateMockData(10000) {
+			addError := s.leaderboardRepo.AddEntryToLeaderboard(table, entry)
+			if addError != nil {
+				fmt.Println(addError)
+			}
+		}
+		domain.OrderLeaderboard(table)
+	}
 }
 
 func (s *GameService) GetLeaderboard(name string) (string, error) {
@@ -195,19 +210,19 @@ func (s *GameService) GetLeaderboard(name string) (string, error) {
 	if table == nil {
 		return "", err
 	}
+	fmt.Println("")
+	fmt.Println("len(table.Entries)", len(table.Entries))
+	fmt.Println("")
 	// create a map of string to store details
-	results := make([]domain.LeaderboardEntry, 0, 100)
+	results := make([]domain.LeaderboardEntry, 0, len(table.Entries))
 
 	// Loop through the entries
-	for i, entry := range table.Entries {
+	for _, entry := range table.Entries {
 		results = append(results, domain.LeaderboardEntry{
 			Username:  entry.User.Username,
 			Score:     entry.Score,
 			Timestamp: entry.Timestamp,
 		})
-		if i == 99 {
-			break
-		}
 	}
 	jsonData, err := json.Marshal(results)
 	if err != nil {

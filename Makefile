@@ -105,24 +105,24 @@ proto: check-protoc
 		go generate ./...; \
 	fi
 
-.PHONY: copy-proto
-copy-proto: proto
-	@echo "Copying proto artifacts to web app project directory"
-	@if [ -z "$(COPY_PROTO_TO_DIR)" ]; then \
-		echo "Error: COPY_PROTO_TO_DIR is not set"; \
-		exit 1; \
-	fi
-	@if [ ! -d "$(COPY_PROTO_TO_DIR)" ]; then \
-		echo "Creating directory $(COPY_PROTO_TO_DIR)"; \
-		mkdir -p $(COPY_PROTO_TO_DIR); \
-	fi
-	@echo "Copying proto files to $(COPY_PROTO_TO_DIR)"
-	@cp -rf ./proto/api.proto $(COPY_PROTO_TO_DIR)/
+# .PHONY: copy-proto
+# copy-proto: proto
+# 	@echo "Copying proto artifacts to web app project directory"
+# 	@if [ -z "$(COPY_PROTO_TO_DIR)" ]; then \
+# 		echo "Error: COPY_PROTO_TO_DIR is not set"; \
+# 		exit 1; \
+# 	fi
+# 	@if [ ! -d "$(COPY_PROTO_TO_DIR)" ]; then \
+# 		echo "Creating directory $(COPY_PROTO_TO_DIR)"; \
+# 		mkdir -p $(COPY_PROTO_TO_DIR); \
+# 	fi
+# 	@echo "Copying proto files to $(COPY_PROTO_TO_DIR)"
+# 	@cp -rf ./proto/api.proto $(COPY_PROTO_TO_DIR)/
 
 
 # Build the Go application
 .PHONY: build
-build: init proto copy-proto
+build: init proto
 	@echo "Building $(BINARY)"
 	$(GO) build -o $(BINARY) $(SRC_DIR)
 
@@ -130,7 +130,13 @@ build: init proto copy-proto
 .PHONY: run
 run: build
 	@echo "Running $(BINARY)..."
-	ENV=$(ENV) ./$(BINARY)
+	ENV=$(ENV) ./$(BINARY) 
+
+# Run the Go application (hot reload)
+.PHONY: dev
+dev: build
+	@echo "Running $(BINARY) with 🔥🔥 HOT RELOAD 🔥🔥 ..."
+	ENV=$(ENV) npx nodemon --watch '*.go' --signal SIGTERM --exec 'go' run ./main.go
 
 # Test the Go application
 .PHONY: test
