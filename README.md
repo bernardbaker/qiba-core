@@ -61,10 +61,10 @@ Enable HTTP/2.
 gcloud run services update qiba --use-http2
 ```
 
-Deploy source code.
+Deploy source code. Service name (press enter). Region (32)
 
 ```bash
-gcloud run deploy --source .
+gcloud run deploy --source . --use-http2
 ```
 
 # Depoying the GAME on GCP
