@@ -33,7 +33,7 @@ func main() {
 	if os.Getenv("ENV") == "development" {
 		service.CreateLeaderboard("qiba", true)
 	} else {
-		service.CreateLeaderboard("qiba", false)
+		service.CreateLeaderboard("qiba", true)
 	}
 
 	// Setting new Logger
