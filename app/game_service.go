@@ -257,7 +257,7 @@ func (s *GameService) SaveLeaderboard(table *domain.Table) error {
 }
 
 func (s *GameService) GameTime() int32 {
-	return 10
+	return 60
 }
 
 func (s *GameService) MaxPlays(user domain.User) int32 {
