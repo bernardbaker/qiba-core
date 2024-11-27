@@ -124,7 +124,6 @@ func (s *GameServer) Leaderboard(ctx context.Context, req *proto.LeaderboardRequ
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("gRPC server leaderboard", jsonString)
 	return &proto.LeaderboardResponse{Success: true, Table: jsonString}, nil
 }
 
