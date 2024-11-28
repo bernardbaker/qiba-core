@@ -7,29 +7,72 @@ import (
 
 	"github.com/bernardbaker/qiba.core/app"
 	"github.com/bernardbaker/qiba.core/infrastructure"
+	"github.com/bernardbaker/qiba.core/ports"
 	"github.com/bernardbaker/qiba.core/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 )
 
+// Repository interfaces
+type RepositoryType string
+
+const (
+	InMemory RepositoryType = "inmemory"
+	MongoDB  RepositoryType = "mongodb"
+)
+
+func getRepositories(repoType RepositoryType) (
+	gameRepo ports.GameRepository,
+	userRepo ports.UserRepository,
+	leaderboardRepo ports.LeaderboardRepository,
+	referralRepo ports.ReferralRepository,
+) {
+	switch repoType {
+	case InMemory:
+		return infrastructure.NewInMemoryGameRepository(),
+			infrastructure.NewInMemoryUserRepository(),
+			infrastructure.NewInMemoryLeaderboardRepository(),
+			infrastructure.NewInMemoryReferralRepository()
+	// Add cases for other repository types
+	case MongoDB:
+		return infrastructure.NewMongoDbGameRepository(),
+			infrastructure.NewMongoDbUserRepository(),
+			infrastructure.NewMongoDbLeaderboardRepository(),
+			infrastructure.NewMongoDbReferralRepository()
+	default:
+		log.Printf("Unknown repository type %s, falling back to in-memory", repoType)
+		return infrastructure.NewInMemoryGameRepository(),
+			infrastructure.NewInMemoryUserRepository(),
+			infrastructure.NewInMemoryLeaderboardRepository(),
+			infrastructure.NewInMemoryReferralRepository()
+	}
+}
+
 func main() {
+	// Get repository type from environment variable
+	repoType := RepositoryType(os.Getenv("REPOSITORY_TYPE"))
+	if repoType == "" {
+		repoType = InMemory
+		log.Printf("No repository type specified, defaulting to %s", repoType)
+	}
+	// Get port number from environment variable
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 		log.Printf("defaulting to port %s", port)
 	}
-	// Initialize repository, encrypter, and game service
-	repo := infrastructure.NewInMemoryGameRepository()                   // Our in-memory game repository
-	userRepo := infrastructure.NewInMemoryUserRepository()               // Our in-memory game repository
-	leaderboardRepo := infrastructure.NewInMemoryLeaderboardRepository() // Our in-memory game repository
-	encrypter := infrastructure.NewEncrypter([]byte("mysecretencryptionkey1234567890a"))
-	service := app.NewGameService(repo, userRepo, leaderboardRepo, encrypter)
-	// Initialize the referral repository and referral service
-	referralRepo := infrastructure.NewInMemoryReferralRepository()
-	referralService := app.NewReferralService(referralRepo)
-	// Initialize the leader board
+	// Initialize repositories based on type
+	gameRepo, userRepo, leaderboardRepo, referralRepo := getRepositories(repoType)
 
+	// Initialize encrypter
+	encrypter := infrastructure.NewEncrypter([]byte("mysecretencryptionkey1234567890a"))
+	// Initialize game service
+	service := app.NewGameService(gameRepo, userRepo, leaderboardRepo, encrypter)
+	// Initialize referral service
+	referralService := app.NewReferralService(referralRepo)
+
+	// Initialize the leader board
 	if os.Getenv("ENV") == "development" {
 		service.CreateLeaderboard("qiba", true)
 	} else {

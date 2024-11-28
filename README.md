@@ -70,3 +70,34 @@ gcloud run deploy --source . --use-http2
 # Depoying the GAME on GCP
 
 Follow the instructions [here](https://cloud.google.com/run/docs/quickstarts/frameworks/deploy-nextjs-service).
+
+When deploying use the following commands:
+
+```bash
+gcloud run deploy --source . \
+  --max-instances=10 \
+  --cpu=1 \
+  --memory=512Mi
+```
+
+- Accept the default service name (press enter).
+
+- Select the region (32).
+
+# QiBA Database
+
+The QIBA Core stores data in memory while working the in the development environment. In production it uses MongoDB more information about the cloud based database can be found [here](https://cloud.google.com/mongodb?hl=en&authuser=1).
+
+During local development the database can be referred to as a [repository](./infrastructure).
+
+- [Game repository](./infrastructure/game_repository_db.go)
+- [Leaderboard repository](./infrastructure/leaderboard_repository_db.go)
+- [Referral repository](./infrastructure/referral_repository_db.go)
+- [User repository](./infrastructure/user_repository_db.go)
+
+In production the current database is MongoDB. The repository files are:
+
+- [Game repository](./infrastructure/game_repository_mongo_db.go)
+- [Leaderboard repository](./infrastructure/leaderboard_repository_mongo_db.go)
+- [Referral repository](./infrastructure/referral_repository_mongo_db.go)
+- [User repository](./infrastructure/user_repository_mongo_db.go)

@@ -24,6 +24,7 @@ PROTOC_ZIP := protoc-$(PROTOC_VERSION)-linux-x86_64.zip
 
 # Development environment
 ENV := development
+REPOSITORY_TYPE := inmemory
 
 ifeq ($(UNAME_S),Darwin)
     ifeq ($(UNAME_M),arm64)
