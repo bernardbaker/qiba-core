@@ -64,7 +64,11 @@ gcloud run services update qiba --use-http2
 Deploy source code. Service name (press enter). Region (32)
 
 ```bash
-gcloud run deploy --source . --use-http2
+gcloud run deploy --source . \
+  --max-instances=10 \
+  --cpu=1 \
+  --memory=512Mi
+  --use-http2
 ```
 
 # Depoying the GAME on GCP
