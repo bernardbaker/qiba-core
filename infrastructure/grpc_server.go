@@ -61,7 +61,7 @@ func (s *GameServer) EndGame(ctx context.Context, req *proto.EndGameRequest) (*p
 	if err != nil {
 		return nil, err
 	}
-	leaderboard, err := s.service.GetLeaderboard("qiba")
+	leaderboard, _, err := s.service.GetLeaderboard("qiba", nil)
 	fmt.Println("gRPC server EndGame", err)
 	fmt.Println("leaderboards", leaderboard)
 	fmt.Println("req.User", req.User)
@@ -119,12 +119,13 @@ func (s *GameServer) Leaderboard(ctx context.Context, req *proto.LeaderboardRequ
 		IsBot:        req.User.IsBot,
 	}
 	fmt.Println("req.User", user)
+
 	// Get the domain table
-	jsonString, err := s.service.GetLeaderboard("qiba")
+	jsonString, usersString, err := s.service.GetLeaderboard("qiba", &user)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.LeaderboardResponse{Success: true, Table: jsonString}, nil
+	return &proto.LeaderboardResponse{Success: true, Table: jsonString, UserScore: usersString}, nil
 }
 
 func (s *GameServer) GameTime(ctx context.Context, req *proto.GameTimeRequest) (*proto.GameTimeResponse, error) {

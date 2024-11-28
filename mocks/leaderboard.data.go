@@ -18,8 +18,8 @@ func GenerateMockData(entries int) []*domain.GameEntry {
 		// Random username from the list
 		username := usernames[rand.Intn(len(usernames))]
 
-		// Random score between -100 and 1000
-		score := rand.Int31n(1101) - 100
+		// Random score between 0 and 10
+		score := rand.Int31n(10)
 
 		// Random timestamp (allow some duplicates)
 		baseTime := time.Now().Add(-time.Duration(rand.Intn(100)) * time.Minute)

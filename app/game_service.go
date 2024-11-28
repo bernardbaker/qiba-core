@@ -194,7 +194,7 @@ func (s *GameService) CreateLeaderboard(name string, prepopulate bool) {
 		if err != nil {
 			fmt.Println(err)
 		}
-		for _, entry := range mocks.GenerateMockData(10000) {
+		for _, entry := range mocks.GenerateMockData(100) {
 			addError := s.leaderboardRepo.AddEntryToLeaderboard(table, entry)
 			if addError != nil {
 				fmt.Println(addError)
@@ -204,32 +204,77 @@ func (s *GameService) CreateLeaderboard(name string, prepopulate bool) {
 	}
 }
 
-func (s *GameService) GetLeaderboard(name string) (string, error) {
+func (s *GameService) GetLeaderboard(name string, user *domain.User) (string, string, error) {
 	table, err := s.leaderboardRepo.GetLeaderboard(name)
 	// if table is nil, create a new one
 	if table == nil {
-		return "", err
+		return "", "", err
 	}
-	fmt.Println("")
-	fmt.Println("len(table.Entries)", len(table.Entries))
-	fmt.Println("")
+
+	// Sort the scores where duplicate scores are sorted by first to score that amount
+	domain.OrderLeaderboard(table)
+
 	// create a map of string to store details
-	results := make([]domain.LeaderboardEntry, 0, len(table.Entries))
+	results := make([]domain.LeaderboardEntry, 0, 100)
+
+	usersScore := make([]domain.LeaderboardEntry, 0, 1)
+	didntFindUser := true
+
+	fmt.Println("")
+	fmt.Println("GetLeaderboard", "User", user)
+	fmt.Println("")
 
 	// Loop through the entries
-	for _, entry := range table.Entries {
+	for i, entry := range table.Entries {
+		if i > 99 {
+			fmt.Println("GetLeaderboard", "i > 99", i)
+			break
+		}
 		results = append(results, domain.LeaderboardEntry{
 			Username:  entry.User.Username,
 			Score:     entry.Score,
 			Timestamp: entry.Timestamp,
 		})
-	}
-	jsonData, err := json.Marshal(results)
-	if err != nil {
-		return "", fmt.Errorf("error converting to JSON: %v", err)
+		if user != nil && entry.User.UserId == user.UserId {
+			fmt.Println("Leeaderboard", "found user with score", entry)
+			didntFindUser = false
+		}
 	}
 
-	return string(jsonData), nil
+	if didntFindUser && user != nil {
+		fmt.Println("")
+		fmt.Println("GetLeaderboard didn't find user && user != nil")
+		fmt.Println("")
+		for _, entry := range table.Entries {
+			if entry.User.UserId == user.UserId {
+				usersScore = append(usersScore, domain.LeaderboardEntry{
+					Username:  entry.User.Username,
+					Score:     entry.Score,
+					Timestamp: entry.Timestamp,
+				})
+				fmt.Println("")
+				fmt.Println("if entry.User.UserId == user.UserId")
+				fmt.Println(usersScore)
+				fmt.Println("")
+			}
+		}
+	}
+
+	jsonData, err := json.Marshal(results)
+	if err != nil {
+		return "", "", fmt.Errorf("error converting to JSON: %v", err)
+	}
+
+	if !didntFindUser && user == nil {
+		return string(jsonData), "", nil
+	} else {
+		userData, err := json.Marshal(usersScore)
+		if err != nil {
+			return "", "", fmt.Errorf("error converting to JSON: %v", err)
+		}
+		fmt.Println("Leaderboard found user with score out of top 100 group", userData)
+		return string(jsonData), string(userData), nil
+	}
 }
 
 func (s *GameService) AddToLeaderboard(user domain.User, score int32) (*domain.Table, error) {
@@ -254,6 +299,15 @@ func (s *GameService) SaveLeaderboard(table *domain.Table) error {
 		return err
 	}
 	return nil
+}
+
+func (s *GameService) GetUserScore(leaderboard *domain.Table, userId int64) (*domain.GameEntry, error) {
+	for _, entry := range leaderboard.Entries {
+		if entry.User.UserId == userId {
+			return &entry, nil
+		}
+	}
+	return nil, errors.New("user not found")
 }
 
 func (s *GameService) GameTime() int32 {

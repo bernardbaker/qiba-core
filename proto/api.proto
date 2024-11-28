@@ -344,6 +344,7 @@ message LeaderboardRequest {
 message LeaderboardResponse {
     bool success = 1;
     string table = 2;
+    string user_score = 3;
 }
 
 message Table {
