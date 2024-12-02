@@ -29,18 +29,29 @@ func (s *GameService) StartGame(userId string, user domain.User) (string, string
 	if err != nil {
 		return "", "", "", err
 	}
-	possibleNewUser := domain.NewUser(user)
-	saveErr := s.userRepo.Save(possibleNewUser)
+	var possibleNewUser *domain.User
+
+	u, getErr := s.userRepo.Get(userId)
+	if getErr != nil {
+		fmt.Println("StartGame", getErr)
+		possibleNewUser = domain.NewUser(user)
+	} else {
+		possibleNewUser = u
+	}
+	saveErr := s.userRepo.Update(possibleNewUser)
 	if saveErr != nil {
-		fmt.Println("Error saving user: ", saveErr)
+		fmt.Println("error saving user: ", saveErr)
 		return "", "", "", saveErr
 	}
 	// Encrypt game data and generate HMAC
-	encryptedData, hmac, err := s.encrypter.EncryptGameData(game.ObjectSeq)
-	if err != nil {
-		return "", "", "", err
-	}
-	return encryptedData, hmac, game.ID, nil
+	// encryptedData, hmac, err := s.encrypter.EncryptGameData(game.ObjectSeq)
+	// if err != nil {
+	// 	return "", "", "", err
+	// }
+
+	// count = 1
+
+	return "", "", game.ID, nil
 }
 
 func (s *GameService) Spawn(gameID string) (string, error) {
@@ -88,15 +99,17 @@ func (s *GameService) EndGame(gameID string) (int32, error) {
 	if err != nil {
 		return 0, err
 	}
-	game.EndTime = time.Now()
+	fmt.Println("EndGame with game ID", game.ID)
+	game.EndTime = time.Now().UTC()
 	updateError := s.repo.UpdateGame(game)
 	if updateError != nil {
 		game.Score = 0
 	}
+	// Reset playsLeft counter
 	return game.Score, updateError
 }
 
-func (s *GameService) CanPlay(user domain.User, timestamp time.Time) bool {
+func (s *GameService) CanPlay(user domain.User) bool {
 	// get all games for user
 	games, err := s.repo.GetGamesByUser(strconv.FormatInt(user.UserId, 10))
 	if err != nil {
@@ -125,13 +138,24 @@ func (s *GameService) CanPlay(user domain.User, timestamp time.Time) bool {
 				fmt.Println("CanPlay", "err = s.userRepo.Save(getUser)", err)
 				fmt.Println(err)
 			}
+		}
+
+		if getUser.BonusGames > 0 {
 			return true
 		}
+
 		// check if the last game was played more than 24 hours ago
-		timeReference := games[len(games)-1].EndTime.UTC().Add(30 * time.Second)
+		lastGame := games[0]
+		fmt.Println("")
+		fmt.Println("lastGame")
+		fmt.Println(lastGame)
+		fmt.Println("")
+		timeReference := lastGame.EndTime.UTC().Add(30 * time.Second)
 		fmt.Println("r", timeReference)
-		latestGame := timestamp.UTC().After(timeReference)
-		fmt.Println("c", timestamp.UTC())
+		// use server timestamp instead of what is sent
+		time := time.Now().UTC()
+		latestGame := time.UTC().After(timeReference)
+		fmt.Println("c", time.UTC())
 
 		fmt.Println("CanPlay", "return latestGame", latestGame)
 		fmt.Println("")
@@ -140,21 +164,12 @@ func (s *GameService) CanPlay(user domain.User, timestamp time.Time) bool {
 }
 
 func (s *GameService) AddBonusGame(user domain.User) (bool, error) {
-	// convert user.UserId to a string
-	userId := strconv.FormatInt(user.UserId, 10)
-	// debugging
-	fmt.Println("AddBonusGame userId", userId)
-	u, err := s.userRepo.Get(userId)
-	if err != nil {
-		fmt.Println("AddBonusGame err := s.userRepo.Get(userId)", err)
-		return false, err
-	}
-	fmt.Println("AddBonusGame u", u)
-	u.BonusGames++
-	fmt.Println("AddBonusGame u.BonusGames", u.BonusGames)
-	saveErr := s.userRepo.Update(u)
+	fmt.Println("AddBonusGame userId", user.UserId)
+	user.BonusGames++
+	fmt.Println("AddBonusGame user.BonusGames", user.BonusGames)
+	saveErr := s.userRepo.Update(&user)
 	if saveErr != nil {
-		fmt.Println("AddBonusGame saveErr := s.userRepo.Save(u)", saveErr)
+		fmt.Println("AddBonusGame saveErr := s.userRepo.Update(&user)", saveErr)
 		return false, saveErr
 	}
 	return true, nil
@@ -311,7 +326,7 @@ func (s *GameService) GetUserScore(leaderboard *domain.Table, userId int64) (*do
 }
 
 func (s *GameService) GameTime() int32 {
-	return 60
+	return 10
 }
 
 func (s *GameService) MaxPlays(user domain.User) int32 {
@@ -325,32 +340,20 @@ func (s *GameService) MaxPlays(user domain.User) int32 {
 		return 1
 	}
 
-	count := 0
+	count := 1
+
 	// get all games for user
-	games, err := s.repo.GetGamesByUser(strconv.FormatInt(user.UserId, 10))
+	games, err := s.repo.GetGamesByUser(userId)
 
 	if err != nil {
-		fmt.Println("MaxPlays err := s.repo.GetGamesByUser(strconv.FormatInt(user.UserId, 10))", err)
+		fmt.Println("MaxPlays err := s.repo.GetGamesByUser(userId)", err)
 	}
 
-	if len(games) == 0 {
-		count++
-	} else {
-		// check if the last game was played more than 24 hours ago
-		timestamp := time.Now()
-		timeReference := games[len(games)-1].EndTime.UTC().Add(30 * time.Second)
-		fmt.Println("r", timeReference)
-		latestGame := timestamp.UTC().After(timeReference)
-		fmt.Println("c", timestamp.UTC())
-
-		if latestGame {
-			count++
+	if len(games) > 0 {
+		if u.BonusGames > 0 {
+			fmt.Println("MaxPlays u.BonusGames > 0", u.BonusGames)
+			count += int(u.BonusGames)
 		}
-	}
-
-	if u.BonusGames > 0 {
-		fmt.Println("MaxPlays u.BonusGames > 0", u.BonusGames)
-		count += int(u.BonusGames)
 	}
 
 	fmt.Println("MaxPlays count", count)
@@ -370,11 +373,21 @@ func (s *GameService) PlayCount(user domain.User) int32 {
 		return 1
 	}
 
-	count := 1
+	// get all games for user
+	games, err := s.repo.GetGamesByUser(strconv.FormatInt(u.UserId, 10))
 
-	if u.BonusGames > 0 {
-		fmt.Println("PlayCount u.BonusGames > 0", u.BonusGames)
-		count += int(u.BonusGames)
+	if err != nil {
+		fmt.Println("PlayCount err := s.repo.GetGamesByUser(strconv.FormatInt(user.UserId, 10))", err)
+	}
+
+	count := 0
+
+	dayStart := domain.StartOfDay(time.Now())
+	dayEnd := domain.EndOfDay(time.Now())
+	for _, game := range games {
+		if game.StartTime.UnixMilli() >= dayStart.UnixMilli() && game.EndTime.UnixMilli() <= dayEnd.UnixMilli() {
+			count++
+		}
 	}
 
 	return int32(count)
@@ -394,13 +407,12 @@ func (s *GameService) PlaysLeft(user domain.User) int32 {
 
 	count := 0
 
-	if u.BonusGames > 0 {
+	if u != nil && u.BonusGames > 0 {
 		fmt.Println("PlaysLeft u.BonusGames > 0", u.BonusGames)
 		count += int(u.BonusGames)
 	}
-
 	// get all games for user
-	games, err := s.repo.GetGamesByUser(strconv.FormatInt(user.UserId, 10))
+	games, err := s.repo.GetGamesByUser(strconv.FormatInt(u.UserId, 10))
 
 	if err != nil {
 		fmt.Println("PlaysLeft err := s.repo.GetGamesByUser(strconv.FormatInt(user.UserId, 10))", err)
@@ -410,13 +422,16 @@ func (s *GameService) PlaysLeft(user domain.User) int32 {
 		count++
 	} else {
 		// check if the last game was played more than 24 hours ago
-		timestamp := time.Now()
-		timeReference := games[len(games)-1].EndTime.UTC().Add(30 * time.Second)
-		latestGame := timestamp.UTC().After(timeReference)
+		timeReference := games[0].EndTime.UTC().Add(30 * time.Second)
+		latestGame := time.Now().UTC().After(timeReference)
 		if latestGame {
 			count++
 		}
-		count = count - 1
+	}
+
+	count--
+	if count < 0 {
+		count = 0
 	}
 
 	return int32(count)

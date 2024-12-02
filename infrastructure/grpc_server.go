@@ -61,11 +61,11 @@ func (s *GameServer) EndGame(ctx context.Context, req *proto.EndGameRequest) (*p
 	if err != nil {
 		return nil, err
 	}
-	leaderboard, _, err := s.service.GetLeaderboard("qiba", nil)
-	fmt.Println("gRPC server EndGame", err)
-	fmt.Println("leaderboards", leaderboard)
-	fmt.Println("req.User", req.User)
-
+	_, userScore, err := s.service.GetLeaderboard("qiba", nil)
+	if err != nil {
+		fmt.Println("gRPC server EndGame", err)
+	}
+	fmt.Println("EndGame", userScore)
 	// create a user
 	user := domain.User{
 		UserId:       req.User.UserId,
@@ -89,18 +89,15 @@ func (s *GameServer) EndGame(ctx context.Context, req *proto.EndGameRequest) (*p
 	return &proto.EndGameResponse{Score: score}, nil
 }
 
+// TODO: regenerate proto files and reupload API gateway
 func (s *GameServer) CanPlay(ctx context.Context, req *proto.CanPlayGameRequest) (*proto.CanPlayGameResponse, error) {
 	// Convert string to int64 first if req.Timestamp is a string
-	milliseconds, err := strconv.ParseInt(req.Timestamp, 10, 64)
-	if err != nil {
-		fmt.Println(err)
-		return &proto.CanPlayGameResponse{Success: false}, nil
-	}
 	user := domain.User{
 		UserId: req.User.UserId,
 	}
-	timestamp := time.UnixMilli(milliseconds).UTC()
-	success := s.service.CanPlay(user, timestamp)
+
+	//TODO: going to use the server time - refactor this
+	success := s.service.CanPlay(user)
 	return &proto.CanPlayGameResponse{Success: success}, nil
 }
 
@@ -219,6 +216,7 @@ func (s *ReferralServer) AcceptReferral(ctx context.Context, req *proto.AcceptRe
 		LastName:     req.From.LastName,
 		LanguageCode: req.From.LanguageCode,
 		IsBot:        req.From.IsBot,
+		BonusGames:   req.From.BonusGames,
 	}
 	to := domain.User{
 		UserId:       req.To.UserId,
@@ -227,6 +225,7 @@ func (s *ReferralServer) AcceptReferral(ctx context.Context, req *proto.AcceptRe
 		LastName:     req.To.LastName,
 		LanguageCode: req.To.LanguageCode,
 		IsBot:        req.To.IsBot,
+		BonusGames:   req.To.BonusGames,
 	}
 	success, err := s.service.Update(from, to, *s.gameService)
 	if !err {
@@ -249,6 +248,7 @@ func (s *ReferralServer) ReferralStatistics(ctx context.Context, req *proto.Refe
 		LastName:     req.User.LastName,
 		LanguageCode: req.User.LanguageCode,
 		IsBot:        req.User.IsBot,
+		BonusGames:   req.User.BonusGames,
 	}
 	bCount, bErr := s.gameService.GetBonusGames(user)
 	if !bErr {

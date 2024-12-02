@@ -9,18 +9,18 @@ import (
 )
 
 type Game struct {
-	ID        string
-	Score     int32
-	ObjectSeq []GameObject
-	StartTime time.Time
-	EndTime   time.Time
-	UserID    string
+	ID        string       `bson:"ID"`
+	Score     int32        `bson:"Score"`
+	ObjectSeq []GameObject `bson:"ObjectSeq"`
+	StartTime time.Time    `bson:"StartTime"`
+	EndTime   time.Time    `bson:"EndTime"`
+	UserID    string       `bson:"UserID"`
 }
 
 type GameObject struct {
-	ID        string
-	Type      string // "a" for add point, "b" for subtract point
-	Timestamp time.Time
+	ID        string    `bson:"ID"`
+	Type      string    `bson:"Type"`
+	Timestamp time.Time `bson:"Timestamp"`
 }
 
 // Generate a new game with random object sequence
@@ -29,6 +29,7 @@ func NewGame(userId string) *Game {
 		ID:        uuid.New().String(),
 		StartTime: time.Now(),
 		UserID:    userId,
+		EndTime:   time.Now(),
 	}
 	return game
 }
@@ -45,4 +46,14 @@ func (g *Game) GenerateObjectSequence() {
 		Timestamp: time.Now(),
 	})
 
+}
+
+func StartOfDay(t time.Time) time.Time {
+	year, month, day := t.Date()
+	return time.Date(year, month, day, 0, 0, 0, 0, t.Location())
+}
+
+func EndOfDay(t time.Time) time.Time {
+	year, month, day := t.Date()
+	return time.Date(year, month, day, 23, 59, 59, 0, t.Location())
 }

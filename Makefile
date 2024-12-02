@@ -24,7 +24,7 @@ PROTOC_ZIP := protoc-$(PROTOC_VERSION)-linux-x86_64.zip
 
 # Development environment
 ENV := development
-REPOSITORY_TYPE := inmemory
+REPOSITORY_TYPE := mongodb
 
 ifeq ($(UNAME_S),Darwin)
     ifeq ($(UNAME_M),arm64)
@@ -137,7 +137,7 @@ run: build
 .PHONY: dev
 dev: build
 	@echo "Running $(BINARY) with 🔥🔥 HOT RELOAD 🔥🔥 ..."
-	ENV=$(ENV) npx nodemon --watch '*.go' --signal SIGTERM --exec 'go' run ./main.go
+	ENV=$(ENV) REPOSITORY_TYPE=$(REPOSITORY_TYPE) npx nodemon --watch '*.go' --signal SIGTERM --exec 'go' run ./main.go
 
 # Test the Go application
 .PHONY: test

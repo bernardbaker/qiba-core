@@ -34,7 +34,11 @@ func getRepositories(repoType RepositoryType) (
 			infrastructure.NewInMemoryUserRepository(),
 			infrastructure.NewInMemoryLeaderboardRepository(),
 			infrastructure.NewInMemoryReferralRepository()
-	// Add cases for other repository types
+	// case MongoDB:
+	// 	return infrastructure.NewInMemoryGameRepository(),
+	// 		infrastructure.NewInMemoryUserRepository(),
+	// 		infrastructure.NewInMemoryLeaderboardRepository(),
+	// 		infrastructure.NewInMemoryReferralRepository()
 	case MongoDB:
 		return infrastructure.NewMongoDbGameRepository(),
 			infrastructure.NewMongoDbUserRepository(),
@@ -76,36 +80,20 @@ func main() {
 	if os.Getenv("ENV") == "development" {
 		service.CreateLeaderboard("qiba", true)
 	} else {
-		service.CreateLeaderboard("qiba", true)
+		service.CreateLeaderboard("qiba", false)
 	}
 
 	// Setting new Logger
 	grpcLog := grpclog.NewLoggerV2(os.Stdout, os.Stderr, os.Stderr)
 	grpclog.SetLoggerV2(grpcLog)
 
-	listener, err := net.Listen("tcp", ":"+port)
+	listener, err := net.Listen("tcp", "0.0.0.0:"+port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	log.Printf("Server listening at %v", listener.Addr().String())
 
-	var server *grpc.Server
-	if os.Getenv("ENV") == "development" {
-		server = grpc.NewServer()
-	} else {
-		// fallbackCreds := credentials.NewTLS(&tls.Config{
-		// 	InsecureSkipVerify: true, // Skip certificate verification for testing purposes
-		// })
-		// Use TLS credentials or custom options
-		// creds, err := xds.NewServerCredentials(xds.ServerOptions{
-		// 	FallbackCreds: fallbackCreds,
-		// })
-		// if err != nil {
-		// 	log.Fatalf("failed to create server credentials: %v", err)
-		// }
-		// server = grpc.NewServer(grpc.Creds(fallbackCreds))
-		server = grpc.NewServer()
-	}
+	server := grpc.NewServer()
 
 	// Register gRPC services
 	proto.RegisterGameServiceServer(server, infrastructure.NewGameServer(service))

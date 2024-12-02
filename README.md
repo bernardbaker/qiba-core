@@ -67,8 +67,9 @@ Deploy source code. Service name (press enter). Region (32)
 gcloud run deploy --source . \
   --max-instances=10 \
   --cpu=1 \
-  --memory=512Mi
-  --use-http2
+  --memory=512Mi \
+  --timeout=300 \
+  --port=8080
 ```
 
 # Depoying the GAME on GCP

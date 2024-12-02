@@ -51,7 +51,7 @@ func (repo *InMemoryUserRepository) Update(user *domain.User) error {
 	userIdStr := strconv.FormatInt(user.UserId, 10)
 	_, exists := repo.users[userIdStr]
 	if !exists {
-		return errors.New("User Repository Update user not found")
+		fmt.Println("User Repository Update user not found")
 	}
 	repo.users[userIdStr] = user
 	return nil
