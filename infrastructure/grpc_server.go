@@ -205,15 +205,26 @@ func (s *ReferralServer) Referral(ctx context.Context, req *proto.ReferralReques
 func (s *ReferralServer) AcceptReferral(ctx context.Context, req *proto.AcceptReferralRequest) (*proto.AcceptReferralResponse, error) {
 	// debugging
 	fmt.Println("AcceptReferral")
-	fmt.Println(s.service.Get(strconv.FormatInt(req.From.UserId, 10)))
+	id := strconv.FormatInt(req.From.UserId, 10)
+	fromUser, getUserError := s.gameService.GetUser(id)
+	if getUserError != nil {
+		fmt.Println("error getting from user in referral")
+		return &proto.AcceptReferralResponse{Success: false}, nil
+	}
+	referral, getReferralError := s.service.Get(id)
+	if !getReferralError {
+		fmt.Println("error getting referral in referral")
+	}
+	fmt.Println("referral", referral)
+	fmt.Println("")
 	from := domain.User{
-		UserId:       req.From.UserId,
-		Username:     req.From.Username,
-		FirstName:    req.From.FirstName,
-		LastName:     req.From.LastName,
-		LanguageCode: req.From.LanguageCode,
-		IsBot:        req.From.IsBot,
-		BonusGames:   req.From.BonusGames,
+		UserId:       fromUser.UserId,
+		Username:     fromUser.Username,
+		FirstName:    fromUser.FirstName,
+		LastName:     fromUser.LastName,
+		LanguageCode: fromUser.LanguageCode,
+		IsBot:        fromUser.IsBot,
+		BonusGames:   fromUser.BonusGames,
 	}
 	to := domain.User{
 		UserId:       req.To.UserId,

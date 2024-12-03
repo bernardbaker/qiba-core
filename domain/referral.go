@@ -7,7 +7,7 @@ import (
 )
 
 type Referral struct {
-	ID         string
+	ID         string `bson:"id"`
 	Referrals  []ReferralObject
 	CreateTime time.Time
 }

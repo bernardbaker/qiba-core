@@ -70,7 +70,7 @@ func (repo *MongoDbReferralRepository) Save(obj *domain.Referral) error {
 func (repo *MongoDbReferralRepository) Get(objId string) *domain.Referral {
 	ctx := context.Background()
 	var referral domain.Referral
-	filter := bson.M{"_id": objId}
+	filter := bson.M{"id": objId}
 
 	err := repo.collection.FindOne(ctx, filter).Decode(&referral)
 	if err != nil {
