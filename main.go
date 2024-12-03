@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 
 	"github.com/bernardbaker/qiba.core/app"
 	"github.com/bernardbaker/qiba.core/infrastructure"
@@ -53,6 +54,19 @@ func getRepositories(repoType RepositoryType) (
 	}
 }
 
+func isPortInUse(host string, port string) bool {
+	address := net.JoinHostPort(host, port)
+	conn, err := net.DialTimeout("tcp", address, time.Second)
+	if err != nil {
+		return false
+	}
+	if conn != nil {
+		conn.Close()
+		return true
+	}
+	return false
+}
+
 func main() {
 	// Get repository type from environment variable
 	repoType := RepositoryType(os.Getenv("REPOSITORY_TYPE"))
@@ -66,6 +80,13 @@ func main() {
 		port = "8080"
 		log.Printf("defaulting to port %s", port)
 	}
+
+	// Check if port is already in use
+	if isPortInUse("0.0.0.0", port) {
+		log.Printf("Port %s is already in use", port)
+		return
+	}
+
 	// Initialize repositories based on type
 	gameRepo, userRepo, leaderboardRepo, referralRepo := getRepositories(repoType)
 
@@ -78,7 +99,7 @@ func main() {
 
 	// Prepopulate the leaderboard
 	// TODO: if the users score is not in the top 100 find it and display it.
-	prepopulate := false
+	prepopulate := true
 	// Initialize the leader board
 	service.CreateLeaderboard("qiba", prepopulate)
 
