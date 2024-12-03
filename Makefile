@@ -26,6 +26,9 @@ PROTOC_ZIP := protoc-$(PROTOC_VERSION)-linux-x86_64.zip
 ENV := development
 REPOSITORY_TYPE := mongodb
 BOT_TOKEN := 7343701893:AAFY184nb9L8HcR_cRlskcGFUEwbsKSy6vE
+GAME_DURATION := 60
+REPLAY_GAME_DELAY_IN_MINUTES := 1
+PLAY_TIME_WINDOW := 2
 
 ifeq ($(UNAME_S),Darwin)
     ifeq ($(UNAME_M),arm64)
@@ -138,7 +141,7 @@ run: build
 .PHONY: dev
 dev: build
 	@echo "Running $(BINARY) with 🔥🔥 HOT RELOAD 🔥🔥 ..."
-	ENV=$(ENV) REPOSITORY_TYPE=$(REPOSITORY_TYPE) npx nodemon --watch '*.go' --signal SIGTERM --exec 'go' run ./main.go
+	ENV=$(ENV) REPOSITORY_TYPE=$(REPOSITORY_TYPE) GAME_DURATION=$(GAME_DURATION) REPLAY_GAME_DELAY_IN_MINUTES=$(REPLAY_GAME_DELAY_IN_MINUTES) PLAY_TIME_WINDOW=$(PLAY_TIME_WINDOW) npx nodemon --watch '*.go' --signal SIGTERM --exec 'go' run ./main.go
 
 # Test the Go application
 .PHONY: test

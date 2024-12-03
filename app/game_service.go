@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"time"
 
@@ -151,7 +152,11 @@ func (s *GameService) CanPlay(user domain.User) bool {
 		fmt.Println("lastGame")
 		fmt.Println(lastGame)
 		fmt.Println("")
-		timeReference := lastGame.EndTime.UTC().Add(1 * time.Minute)
+		delay, replayErr := strconv.ParseInt(os.Getenv("REPLAY_GAME_DELAY_IN_MINUTES"), 10, 32)
+		if err != nil {
+			fmt.Println("replay game delay error", replayErr)
+		}
+		timeReference := lastGame.EndTime.UTC().Add(time.Duration(delay) * time.Minute)
 		fmt.Println("r", timeReference)
 		// use server timestamp instead of what is sent
 		time := time.Now().UTC()
@@ -334,7 +339,11 @@ func (s *GameService) GetUserScore(leaderboard *domain.Table, userId int64) (*do
 }
 
 func (s *GameService) GameTime() int32 {
-	return 10
+	time, err := strconv.ParseInt(os.Getenv("GAME_DURATION"), 10, 32)
+	if err != nil {
+		return 60
+	}
+	return int32(time)
 }
 
 func (s *GameService) MaxPlays(user domain.User) int32 {
@@ -390,10 +399,22 @@ func (s *GameService) PlayCount(user domain.User) int32 {
 
 	count := 0
 
-	dayStart := domain.StartOfDay(time.Now())
-	dayEnd := domain.EndOfDay(time.Now())
+	delay, replayErr := strconv.ParseInt(os.Getenv("PLAY_TIME_WINDOW"), 10, 32)
+	if replayErr != nil {
+		fmt.Println("play count play time window delay error", replayErr)
+		delay = 2
+	}
+	fmt.Println("PlayCount play window")
+	fmt.Println("delay", delay)
+	start := time.Now()
+	end := start.Add(time.Duration(delay) * time.Minute)
+	start = start.Add(-time.Duration(delay) * time.Minute)
+	fmt.Println(start)
+	fmt.Println(end)
+	fmt.Println("PlayCount play window")
 	for _, game := range games {
-		if game.StartTime.UnixMilli() >= dayStart.UnixMilli() && game.EndTime.UnixMilli() <= dayEnd.UnixMilli() {
+		if game.StartTime.UnixMilli() >= start.UnixMilli() && game.EndTime.UnixMilli() <= end.UnixMilli() {
+			fmt.Println("PlayCount game", game.ID)
 			count++
 		}
 	}
@@ -435,7 +456,11 @@ func (s *GameService) PlaysLeft(user domain.User) int32 {
 		fmt.Println("lastGame")
 		fmt.Println(lastGame)
 		fmt.Println("")
-		timeReference := lastGame.EndTime.UTC().Add(1 * time.Minute)
+		delay, replayErr := strconv.ParseInt(os.Getenv("REPLAY_GAME_DELAY_IN_MINUTES"), 10, 32)
+		if err != nil {
+			fmt.Println("replay game delay error", replayErr)
+		}
+		timeReference := lastGame.EndTime.UTC().Add(time.Duration(delay) * time.Minute)
 		fmt.Println("r", timeReference)
 		// use server timestamp instead of what is sent
 		time := time.Now().UTC()
