@@ -110,6 +110,8 @@ func (repo *MongoDbGameRepository) UpdateGame(game *domain.Game) error {
 		return fmt.Errorf("game not found with id: %s", game.ID)
 	}
 
+	fmt.Printf("Updated %d games\n", result.ModifiedCount)
+
 	return nil
 }
 

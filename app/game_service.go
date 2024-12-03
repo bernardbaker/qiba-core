@@ -103,10 +103,11 @@ func (s *GameService) EndGame(gameID string) (int32, error) {
 	game.EndTime = time.Now().UTC()
 	updateError := s.repo.UpdateGame(game)
 	if updateError != nil {
+		fmt.Println("EndGame", "updateError = s.repo.UpdateGame(game)", updateError)
 		game.Score = 0
 	}
 	// Reset playsLeft counter
-	return game.Score, updateError
+	return game.Score, nil
 }
 
 func (s *GameService) CanPlay(user domain.User) bool {
@@ -150,7 +151,7 @@ func (s *GameService) CanPlay(user domain.User) bool {
 		fmt.Println("lastGame")
 		fmt.Println(lastGame)
 		fmt.Println("")
-		timeReference := lastGame.EndTime.UTC().Add(30 * time.Second)
+		timeReference := lastGame.EndTime.UTC().Add(1 * time.Minute)
 		fmt.Println("r", timeReference)
 		// use server timestamp instead of what is sent
 		time := time.Now().UTC()
@@ -223,6 +224,7 @@ func (s *GameService) GetLeaderboard(name string, user *domain.User) (string, st
 	table, err := s.leaderboardRepo.GetLeaderboard(name)
 	// if table is nil, create a new one
 	if table == nil {
+		fmt.Println("GameService GetLeaderboard table is nil")
 		return "", "", err
 	}
 
@@ -236,7 +238,7 @@ func (s *GameService) GetLeaderboard(name string, user *domain.User) (string, st
 	didntFindUser := true
 
 	fmt.Println("")
-	fmt.Println("GetLeaderboard", "User", user)
+	fmt.Println("GetLeaderboard User", user)
 	fmt.Println("")
 
 	// Loop through the entries
@@ -251,7 +253,7 @@ func (s *GameService) GetLeaderboard(name string, user *domain.User) (string, st
 			Timestamp: entry.Timestamp,
 		})
 		if user != nil && entry.User.UserId == user.UserId {
-			fmt.Println("Leeaderboard", "found user with score", entry)
+			fmt.Println("Leaderboard found user with score", entry)
 			didntFindUser = false
 		}
 	}
@@ -293,22 +295,28 @@ func (s *GameService) GetLeaderboard(name string, user *domain.User) (string, st
 }
 
 func (s *GameService) AddToLeaderboard(user domain.User, score int32) (*domain.Table, error) {
+	fmt.Println("")
 	entry := domain.NewLeaderboardObject(user, score)
 	if entry == nil {
+		fmt.Println("GameService", "AddToLeaderboard", "entry error", entry)
 		return nil, errors.New("entry is nil")
 	}
 	table, err := s.leaderboardRepo.GetLeaderboard("qiba")
 	if err != nil {
+		fmt.Println("GameService", "GetLeaderboard", "error", err)
 		return nil, err
 	}
 	addError := s.leaderboardRepo.AddEntryToLeaderboard(table, entry)
 	if addError != nil {
+		fmt.Println("GameService", "AddEntryToLeaderboard", "addError", addError)
 		return nil, addError
 	}
+	fmt.Println("GameService", "GetLeaderboard", "table", table)
+	fmt.Println("")
 	return table, nil
 }
 
-func (s *GameService) SaveLeaderboard(table *domain.Table) error {
+func (s *GameService) UpdateLeaderboard(table *domain.Table) error {
 	err := s.leaderboardRepo.SaveLeaderboard(table)
 	if err != nil {
 		return err
@@ -422,8 +430,17 @@ func (s *GameService) PlaysLeft(user domain.User) int32 {
 		count++
 	} else {
 		// check if the last game was played more than 24 hours ago
-		timeReference := games[0].EndTime.UTC().Add(30 * time.Second)
-		latestGame := time.Now().UTC().After(timeReference)
+		lastGame := games[0]
+		fmt.Println("")
+		fmt.Println("lastGame")
+		fmt.Println(lastGame)
+		fmt.Println("")
+		timeReference := lastGame.EndTime.UTC().Add(1 * time.Minute)
+		fmt.Println("r", timeReference)
+		// use server timestamp instead of what is sent
+		time := time.Now().UTC()
+		latestGame := time.UTC().After(timeReference)
+		fmt.Println("c", time.UTC())
 		if latestGame {
 			count++
 		}

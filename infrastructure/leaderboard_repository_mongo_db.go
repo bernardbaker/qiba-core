@@ -50,39 +50,65 @@ func NewMongoDbLeaderboardRepository() *MongoDbLeaderboardRepository {
 
 // SaveLeaderboard stores a new leaderboard in MongoDB
 func (repo *MongoDbLeaderboardRepository) SaveLeaderboard(table *domain.Table) error {
-	_, err := repo.collection.InsertOne(context.TODO(), table)
+	doc := bson.M{"$set": bson.M{
+		"ID":      table.ID,
+		"Entries": table.Entries,
+	}}
+	// Check if user already exists
+	filter := bson.M{"ID": table.ID}
+	opts := options.Update().SetUpsert(true)
+	// Use UpdateOne with upsert to either insert new or update existing
+	_, err := repo.collection.UpdateOne(
+		context.TODO(),
+		filter,
+		doc,
+		opts,
+	)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to save leaderboard: %w", err)
 	}
 	return nil
 }
 
 // GetLeaderboard retrieves a table by its ID
 func (repo *MongoDbLeaderboardRepository) GetLeaderboard(tableID string) (*domain.Table, error) {
-	var table domain.Table
-	err := repo.collection.FindOne(context.TODO(), bson.M{"id": tableID}).Decode(&table)
+	fmt.Println("")
+	table := &domain.Table{}
+	err := repo.collection.FindOne(context.TODO(), bson.M{"ID": tableID}).Decode(&table)
 	if err != nil {
+		fmt.Println("MongoDbLeaderboardRepository", "GetLeaderboard", "error", tableID, err)
 		if err == mongo.ErrNoDocuments {
 			return nil, errors.New("table not found")
 		}
 		return nil, err
 	}
-	return &table, nil
+	fmt.Println("MongoDbLeaderboardRepository", "GetLeaderboard", table)
+	fmt.Println("")
+	return table, nil
 }
 
 // UpdateLeaderboard updates an existing table in MongoDB
 func (repo *MongoDbLeaderboardRepository) UpdateLeaderboard(table *domain.Table) error {
-	result, err := repo.collection.ReplaceOne(
-		context.TODO(),
-		bson.M{"id": table.ID},
-		table,
+	fmt.Println("")
+	fmt.Println("MongoDbLeaderboardRepository", "UpdateLeaderboard", table.ID)
+	ctx := context.Background()
+	update := bson.M{"$set": bson.M{
+		"ID":      table.ID,
+		"Entries": table.Entries,
+	}}
+	result, err := repo.collection.UpdateOne(
+		ctx,
+		bson.M{"ID": table.ID},
+		update,
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to update leaderboard: %w", err)
 	}
 	if result.MatchedCount == 0 {
 		return errors.New("table not found")
 	}
+	fmt.Println("MongoDbLeaderboardRepository", "UpdateLeaderboard", result.ModifiedCount)
+	fmt.Println("")
 	return nil
 }
 
@@ -90,10 +116,10 @@ func (repo *MongoDbLeaderboardRepository) UpdateLeaderboard(table *domain.Table)
 func (repo *MongoDbLeaderboardRepository) AddEntryToLeaderboard(table *domain.Table, entry *domain.GameEntry) error {
 	result, err := repo.collection.UpdateOne(
 		context.TODO(),
-		bson.M{"id": table.ID},
+		bson.M{"ID": table.ID},
 		bson.M{
 			"$push": bson.M{
-				"entries": entry,
+				"Entries": &entry,
 			},
 		},
 	)

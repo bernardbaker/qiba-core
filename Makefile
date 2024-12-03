@@ -25,6 +25,7 @@ PROTOC_ZIP := protoc-$(PROTOC_VERSION)-linux-x86_64.zip
 # Development environment
 ENV := development
 REPOSITORY_TYPE := mongodb
+BOT_TOKEN := 7343701893:AAFY184nb9L8HcR_cRlskcGFUEwbsKSy6vE
 
 ifeq ($(UNAME_S),Darwin)
     ifeq ($(UNAME_M),arm64)

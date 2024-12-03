@@ -76,12 +76,11 @@ func main() {
 	// Initialize referral service
 	referralService := app.NewReferralService(referralRepo)
 
+	// Prepopulate the leaderboard
+	// TODO: if the users score is not in the top 100 find it and display it.
+	prepopulate := false
 	// Initialize the leader board
-	if os.Getenv("ENV") == "development" {
-		service.CreateLeaderboard("qiba", true)
-	} else {
-		service.CreateLeaderboard("qiba", false)
-	}
+	service.CreateLeaderboard("qiba", prepopulate)
 
 	// Setting new Logger
 	grpcLog := grpclog.NewLoggerV2(os.Stdout, os.Stderr, os.Stderr)

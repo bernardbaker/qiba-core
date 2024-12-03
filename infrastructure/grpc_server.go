@@ -57,15 +57,13 @@ func (s *GameServer) Tap(ctx context.Context, req *proto.TapRequest) (*proto.Tap
 }
 
 func (s *GameServer) EndGame(ctx context.Context, req *proto.EndGameRequest) (*proto.EndGameResponse, error) {
+	fmt.Println("")
+	fmt.Println("start gRPC Server EndGame")
 	score, err := s.service.EndGame(req.GameId)
 	if err != nil {
 		return nil, err
 	}
-	_, userScore, err := s.service.GetLeaderboard("qiba", nil)
-	if err != nil {
-		fmt.Println("gRPC server EndGame", err)
-	}
-	fmt.Println("EndGame", userScore)
+	fmt.Printf("User scored %d\n", score)
 	// create a user
 	user := domain.User{
 		UserId:       req.User.UserId,
@@ -76,15 +74,14 @@ func (s *GameServer) EndGame(ctx context.Context, req *proto.EndGameRequest) (*p
 		IsBot:        req.User.IsBot,
 	}
 	fmt.Println("EndGame user", user)
-	table, err := s.service.AddToLeaderboard(user, score)
-	if err != nil {
-		return nil, errors.New("failed to add user to leaderboard")
+
+	_, addErr := s.service.AddToLeaderboard(user, score)
+	if addErr != nil {
+		fmt.Println("table, addErr := s.service.AddToLeaderboard(user, score)", addErr)
+		return nil, addErr
 	}
-	fmt.Println("after leaderboard table", len(table.Entries))
-	saveErr := s.service.SaveLeaderboard(table)
-	if saveErr != nil {
-		return nil, errors.New("failed to save leaderboard")
-	}
+	fmt.Println("end gRPC Server EndGame")
+	fmt.Println("")
 	// TODO Using the returned user update the Table
 	return &proto.EndGameResponse{Score: score}, nil
 }

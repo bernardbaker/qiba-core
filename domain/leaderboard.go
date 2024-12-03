@@ -7,14 +7,14 @@ import (
 )
 
 type GameEntry struct {
-	User      User
-	Score     int32
-	Timestamp time.Time
+	User      User      `bson:"User"`
+	Score     int32     `bson:"Score"`
+	Timestamp time.Time `bson:"Timestamp"`
 }
 
 type Table struct {
-	ID      string
-	Entries []GameEntry
+	ID      string      `bson:"id"`
+	Entries []GameEntry `bson:"entries"`
 }
 
 type LeaderboardEntry struct {
