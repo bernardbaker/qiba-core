@@ -8,7 +8,7 @@ import (
 )
 
 func GenerateMockData(entries int) []*domain.GameEntry {
-	usernames := []string{"rogue", "mage", "warrior", "healer", "hunter", "rogue", "mage", "paladin", "extralongusernamefromsomewhere"}
+	usernames := []string{"job", "mage", "warrior", "healer", "hunter", "job", "mage"}
 	mockData := make([]*domain.GameEntry, 0, entries)
 
 	// Seed random number generator
