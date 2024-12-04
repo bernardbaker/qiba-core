@@ -226,6 +226,14 @@ func (s *GameService) GetBonusGames(user domain.User) (string, bool) {
 }
 
 func (s *GameService) CreateLeaderboard(name string, prepopulate bool) {
+	exists, getError := s.leaderboardRepo.GetLeaderboard(name)
+	if getError != nil {
+		fmt.Println(getError)
+	}
+	if exists != nil {
+		fmt.Println("Leaderboard already exists")
+		return
+	}
 	leaderboard := domain.NewLeaderboard(name)
 	s.leaderboardRepo.SaveLeaderboard(leaderboard)
 
