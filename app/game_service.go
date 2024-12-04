@@ -173,7 +173,17 @@ func (s *GameService) AddBonusGame(user domain.User) (bool, error) {
 	fmt.Println("AddBonusGame userId", user.UserId)
 	user.BonusGames++
 	fmt.Println("AddBonusGame user.BonusGames", user.BonusGames)
-	saveErr := s.userRepo.Update(&user)
+
+	update := domain.User{
+		UserId:       user.UserId,
+		BonusGames:   user.BonusGames,
+		FirstName:    user.FirstName,
+		IsBot:        false,
+		LanguageCode: user.LanguageCode,
+		Username:     user.Username,
+		LastName:     user.LastName,
+	}
+	saveErr := s.userRepo.Update(&update)
 	if saveErr != nil {
 		fmt.Println("AddBonusGame saveErr := s.userRepo.Update(&user)", saveErr)
 		return false, saveErr

@@ -82,5 +82,12 @@ func (s *ReferralService) Update(from domain.User, to domain.User, gameService G
 			return success, true
 		}
 	}
+
+	bonusGames := from.BonusGames
+	bonusGames++
+	from.BonusGames = bonusGames
+
+	gameService.userRepo.Update(&from)
+
 	return false, false
 }
