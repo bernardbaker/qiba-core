@@ -12,7 +12,6 @@ import (
 	"github.com/bernardbaker/qiba.core/proto"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
 )
 
 // Repository interfaces
@@ -67,7 +66,20 @@ func isPortInUse(host string, port string) bool {
 	return false
 }
 
+func disableAllLogs() {
+	// Redirect stderr to null device
+	null, _ := os.Open(os.DevNull)
+	os.Stderr = null
+
+	// Redirect stdout to null device if needed
+	os.Stdout = null
+}
+
 func main() {
+	if os.Getenv("ENV") != "development" {
+		disableAllLogs()
+	}
+
 	// Get repository type from environment variable
 	repoType := RepositoryType(os.Getenv("REPOSITORY_TYPE"))
 	if repoType == "" {
@@ -104,8 +116,8 @@ func main() {
 	service.CreateLeaderboard("qiba", prepopulate)
 
 	// Setting new Logger
-	grpcLog := grpclog.NewLoggerV2(os.Stdout, os.Stderr, os.Stderr)
-	grpclog.SetLoggerV2(grpcLog)
+	// grpcLog := grpclog.NewLoggerV2(os.Stdout, os.Stderr, os.Stderr)
+	// grpclog.SetLoggerV2(grpcLog)
 
 	listener, err := net.Listen("tcp", "0.0.0.0:"+port)
 	if err != nil {

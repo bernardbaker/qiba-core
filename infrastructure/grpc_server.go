@@ -245,10 +245,12 @@ func (s *ReferralServer) AcceptReferral(ctx context.Context, req *proto.AcceptRe
 func (s *ReferralServer) ReferralStatistics(ctx context.Context, req *proto.ReferralStatisticsRequest) (*proto.ReferralStatisticsResponse, error) {
 	objects, err := s.service.Get(strconv.FormatInt(req.User.UserId, 10))
 	if !err {
-		fmt.Println(errors.New("gRPC server referral statistics error"))
-		return nil, nil
+		fmt.Println("gRPC server referral statistics error", err)
 	}
-	count := int64(len(objects.Referrals))
+	var count int64
+	if objects != nil {
+		count = int64(len(objects.Referrals))
+	}
 	user := domain.User{
 		UserId:       req.User.UserId,
 		Username:     req.User.Username,
@@ -260,7 +262,7 @@ func (s *ReferralServer) ReferralStatistics(ctx context.Context, req *proto.Refe
 	}
 	bCount, bErr := s.gameService.GetBonusGames(user)
 	if !bErr {
-		fmt.Println(errors.New("gRPC server referral statistics get bonus games error"))
+		fmt.Println("gRPC server referral statistics get bonus games error", bErr)
 		return nil, nil
 	}
 	return &proto.ReferralStatisticsResponse{Success: true, Count: count, BonusCount: bCount}, nil
