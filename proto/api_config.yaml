@@ -39,4 +39,4 @@ usage:
 backend:
   rules:
     - selector: "*"
-      address: grpcs://qiba-avjqtaa5hq-uc.a.run.app
+      address: grpcs://qiba-frfefehcjq-uc.a.run.app
