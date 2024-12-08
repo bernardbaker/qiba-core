@@ -104,6 +104,10 @@ gcloud run deploy --source . \
 
 - Allow unauthenticated invocations.
 
+See [this](https://cloud.google.com/run/docs/authenticating/public) web page if you receive a `Error: Forbidden Your client does not have permission to get URL / from this server.` message when navigating to the deploy Cloud Run URL for the game UI.
+
+You may need to follow the guidance found [here](https://cloud.google.com/blog/topics/developers-practitioners/how-create-public-cloud-run-services-when-domain-restricted-sharing-enforced) on conditional policies when DRS is enabled.
+
 # QiBA Database
 
 The QIBA Core stores data in memory while working the in the development environment. In production it uses MongoDB more information about the cloud based database can be found [here](https://cloud.google.com/mongodb?hl=en&authuser=1).
