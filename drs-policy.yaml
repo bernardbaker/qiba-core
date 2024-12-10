@@ -1,0 +1,10 @@
+name: organizations/116120341088/policies/iam.allowedPolicyMemberDomains
+spec:
+  rules:
+    - values:
+        allowedValues:
+          - C03tdyb5l
+    - allowAll: true
+      condition:
+        expression: resource.matchTag("116120341088/allUsersIngress", "True")
+        title: allowAllUsersIngress

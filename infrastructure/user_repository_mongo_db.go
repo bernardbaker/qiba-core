@@ -25,13 +25,7 @@ type MongoDbUserRepository struct {
 func NewMongoDbUserRepository() *MongoDbUserRepository {
 	// Use the SetServerAPIOptions() method to set the version of the Stable API on the client
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	var opts *options.ClientOptions
-	if os.Getenv("ENV") == "development" {
-		opts = options.Client().ApplyURI("mongodb+srv://bernard:kCxUAkcAKwhFcEyl@qiba-game.umja7yd.mongodb.net/?retryWrites=true&w=majority&appName=qiba-game").SetServerAPIOptions(serverAPI)
-	} else {
-		opts = options.Client().ApplyURI("mongodb+srv://bernard:kCxUAkcAKwhFcEyl@qiba-game.umja7yd.mongodb.net/?retryWrites=true&w=majority&appName=qiba-game").SetServerAPIOptions(serverAPI)
-		// opts = options.Client().ApplyURI("mongodb+srv://bernard:kCxUAkcAKwhFcEyl@qiba-game-pl-0.lbdk6.mongodb.net/?retryWrites=true&w=majority&appName=qiba-game").SetServerAPIOptions(serverAPI)
-	}
+	opts := options.Client().ApplyURI("mongodb+srv://" + os.Getenv("MONGO_DB_USER") + ":" + os.Getenv("MONGO_DB_PASSWORD") + "@" + os.Getenv("MONGO_DB_URL") + "/?retryWrites=true&w=majority&appName=qiba-game").SetServerAPIOptions(serverAPI)
 	// Create a new client and connect to the server
 	client, err := mongo.Connect(context.TODO(), opts)
 	if err != nil {
