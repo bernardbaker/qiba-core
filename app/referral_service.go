@@ -18,6 +18,9 @@ func NewReferralService(repo ports.ReferralRepository) *ReferralService {
 }
 
 func (s *ReferralService) Create(user int64) error {
+	fmt.Println("")
+	fmt.Println(">>")
+	fmt.Println("user", user)
 	owner := strconv.FormatInt(user, 10)
 	fmt.Println("owner", owner)
 	u := s.repo.Get(owner)
@@ -89,5 +92,5 @@ func (s *ReferralService) Update(from domain.User, to domain.User, gameService G
 
 	gameService.userRepo.Update(&from)
 
-	return false, false
+	return true, true
 }

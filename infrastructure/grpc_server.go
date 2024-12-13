@@ -185,7 +185,7 @@ func NewReferralServer(service *app.ReferralService, gameService *app.GameServic
 }
 
 func (s *ReferralServer) Referral(ctx context.Context, req *proto.ReferralRequest) (*proto.ReferralResponse, error) {
-	fmt.Println("req.User", req.User)
+	fmt.Println("req.User.UserId", req.User.UserId)
 	// Create a new user
 	user := domain.User{
 		UserId:       req.User.UserId,
@@ -199,6 +199,11 @@ func (s *ReferralServer) Referral(ctx context.Context, req *proto.ReferralReques
 	if addErr != nil {
 		return nil, addErr
 	}
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("Referral")
+	fmt.Println(req.User)
+	fmt.Println("")
 	// Add the user to the service
 	createErr := s.service.Create(req.User.UserId)
 	if createErr != nil {
@@ -232,7 +237,7 @@ func (s *ReferralServer) AcceptReferral(ctx context.Context, req *proto.AcceptRe
 		LastName:     fromUser.LastName,
 		LanguageCode: fromUser.LanguageCode,
 		IsBot:        fromUser.IsBot,
-		BonusGames:   fromUser.BonusGames,
+		// BonusGames:   fromUser.BonusGames,
 	}
 	to := domain.User{
 		UserId:       req.To.UserId,
@@ -241,7 +246,7 @@ func (s *ReferralServer) AcceptReferral(ctx context.Context, req *proto.AcceptRe
 		LastName:     req.To.LastName,
 		LanguageCode: req.To.LanguageCode,
 		IsBot:        req.To.IsBot,
-		BonusGames:   req.To.BonusGames,
+		// BonusGames:   req.To.BonusGames,
 	}
 	success, err := s.service.Update(from, to, *s.gameService)
 	if !err {

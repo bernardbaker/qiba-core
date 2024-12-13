@@ -111,7 +111,7 @@ func main() {
 
 	// Prepopulate the leaderboard
 	// TODO: if the users score is not in the top 100 find it and display it.
-	prepopulate := true
+	prepopulate := false
 	if prepopulate {
 		// Initialize the leader board
 		service.CreateLeaderboard("dev", prepopulate)
