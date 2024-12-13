@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"time"
 
@@ -114,8 +115,15 @@ func (s *GameServer) Leaderboard(ctx context.Context, req *proto.LeaderboardRequ
 	}
 	fmt.Println("req.User", user)
 
+	var name string
+	if os.Getenv("ENV") == "development" {
+		name = "dev"
+	} else {
+		name = "qiba"
+	}
+
 	// Get the domain table
-	jsonString, usersString, err := s.service.GetLeaderboard("qiba", &user)
+	jsonString, usersString, err := s.service.GetLeaderboard(name, &user)
 	if err != nil {
 		return nil, err
 	}

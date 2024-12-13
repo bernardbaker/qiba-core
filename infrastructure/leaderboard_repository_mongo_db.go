@@ -67,7 +67,7 @@ func (repo *MongoDbLeaderboardRepository) SaveLeaderboard(table *domain.Table) e
 // GetLeaderboard retrieves a table by its ID
 func (repo *MongoDbLeaderboardRepository) GetLeaderboard(tableID string) (*domain.Table, error) {
 	fmt.Println("")
-	table := &domain.Table{}
+	table := domain.Table{}
 	err := repo.collection.FindOne(context.TODO(), bson.M{"ID": tableID}).Decode(&table)
 	if err != nil {
 		fmt.Println("MongoDbLeaderboardRepository", "GetLeaderboard", "error", tableID, err)
@@ -78,7 +78,7 @@ func (repo *MongoDbLeaderboardRepository) GetLeaderboard(tableID string) (*domai
 	}
 	fmt.Println("MongoDbLeaderboardRepository", "GetLeaderboard", table)
 	fmt.Println("")
-	return table, nil
+	return &table, nil
 }
 
 // UpdateLeaderboard updates an existing table in MongoDB

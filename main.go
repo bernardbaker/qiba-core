@@ -111,9 +111,13 @@ func main() {
 
 	// Prepopulate the leaderboard
 	// TODO: if the users score is not in the top 100 find it and display it.
-	prepopulate := false
-	// Initialize the leader board
-	service.CreateLeaderboard("qiba", prepopulate)
+	prepopulate := true
+	if prepopulate {
+		// Initialize the leader board
+		service.CreateLeaderboard("dev", prepopulate)
+	} else {
+		service.CreateLeaderboard("qiba", false)
+	}
 
 	// Setting new Logger
 	// grpcLog := grpclog.NewLoggerV2(os.Stdout, os.Stderr, os.Stderr)

@@ -232,14 +232,17 @@ func (s *GameService) CreateLeaderboard(name string, prepopulate bool) {
 	}
 	if exists != nil {
 		fmt.Println("Leaderboard already exists")
-		return
+		if !prepopulate {
+			return
+		}
 	}
 	leaderboard := domain.NewLeaderboard(name)
 	s.leaderboardRepo.SaveLeaderboard(leaderboard)
 
 	if prepopulate {
-		table, err := s.leaderboardRepo.GetLeaderboard("qiba")
+		table, err := s.leaderboardRepo.GetLeaderboard(name)
 		if err != nil {
+			fmt.Println("error with table")
 			fmt.Println(err)
 		}
 		for _, entry := range mocks.GenerateMockData(100) {
@@ -248,7 +251,6 @@ func (s *GameService) CreateLeaderboard(name string, prepopulate bool) {
 				fmt.Println(addError)
 			}
 		}
-		domain.OrderLeaderboard(table)
 	}
 }
 
@@ -261,7 +263,20 @@ func (s *GameService) GetLeaderboard(name string, user *domain.User) (string, st
 	}
 
 	// Sort the scores where duplicate scores are sorted by first to score that amount
-	domain.OrderLeaderboard(table)
+	// domain.OrderLeaderboard(table)
+
+	fmt.Println("table", &table)
+
+	// Using the sorted version
+	sortedTotals := domain.GroupAndTotalScoresByUserSorted(table)
+	fmt.Println("sortedTotals", sortedTotals)
+	for _, userScore := range sortedTotals {
+		fmt.Printf("User: %s, Total Score: %d\n",
+			userScore.DisplayName,
+			userScore.TotalScore,
+			// userScore.LastPlayed.Format(time.RFC3339)
+		)
+	}
 
 	// create a map of string to store details
 	results := make([]domain.LeaderboardEntry, 0, 100)
@@ -274,15 +289,14 @@ func (s *GameService) GetLeaderboard(name string, user *domain.User) (string, st
 	fmt.Println("")
 
 	// Loop through the entries
-	for i, entry := range table.Entries {
+	for i, entry := range sortedTotals {
 		if i > 99 {
 			fmt.Println("GetLeaderboard", "i > 99", i)
 			break
 		}
 		results = append(results, domain.LeaderboardEntry{
-			Username:  entry.User.Username,
-			Score:     entry.Score,
-			Timestamp: entry.Timestamp,
+			Username: entry.DisplayName,
+			Score:    entry.TotalScore,
 		})
 		if user != nil && entry.User.UserId == user.UserId {
 			fmt.Println("Leaderboard found user with score", entry)
@@ -297,9 +311,8 @@ func (s *GameService) GetLeaderboard(name string, user *domain.User) (string, st
 		for _, entry := range table.Entries {
 			if entry.User.UserId == user.UserId {
 				usersScore = append(usersScore, domain.LeaderboardEntry{
-					Username:  entry.User.Username,
-					Score:     entry.Score,
-					Timestamp: entry.Timestamp,
+					Username: entry.User.Username,
+					Score:    entry.Score,
 				})
 				fmt.Println("")
 				fmt.Println("if entry.User.UserId == user.UserId")
