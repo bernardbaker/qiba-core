@@ -112,6 +112,7 @@ func (s *GameService) EndGame(gameID string) (int32, error) {
 }
 
 func (s *GameService) CanPlay(user domain.User) bool {
+	fmt.Println("CanPlay", "user.UserId", user.UserId)
 	// get all games for user
 	games, err := s.repo.GetGamesByUser(strconv.FormatInt(user.UserId, 10))
 	if err != nil {
@@ -156,11 +157,13 @@ func (s *GameService) CanPlay(user domain.User) bool {
 		if err != nil {
 			fmt.Println("replay game delay error", replayErr)
 		}
+		fmt.Println("delay", delay)
+		fmt.Println("lastGame.EndTime.UTC()", lastGame.EndTime.UTC())
 		timeReference := lastGame.EndTime.UTC().Add(time.Duration(delay) * time.Minute)
 		fmt.Println("r", timeReference)
 		// use server timestamp instead of what is sent
 		time := time.Now().UTC()
-		latestGame := time.UTC().After(timeReference)
+		latestGame := time.After(timeReference)
 		fmt.Println("c", time.UTC())
 
 		fmt.Println("CanPlay", "return latestGame", latestGame)
